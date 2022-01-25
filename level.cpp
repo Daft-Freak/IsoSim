@@ -37,11 +37,32 @@ void Level::render() {
 
             // palette swap
             if((x + y) & 1)
-                tiles->palette[2] = {0x20, 0x20, 0x20};
+                tiles->palette[3] = {0x20, 0x20, 0x20};
             else
-                tiles->palette[2] = {0xDF, 0xDF, 0xDF};
+                tiles->palette[3] = {0xDF, 0xDF, 0xDF};
 
-            screen.sprite({0, 0, tile_width / 8, tile_height / 8}, {center_x - tile_width / 2, center_y - tile_height / 2});
+            // walls
+            int wall_y_off = tile_height + tile_height / 2;
+            const int wall_h = 16;
+
+            // top wall
+            if(y < 5 && !(y & 1) && x >= y && y < map_width - x)
+                screen.sprite({12, 0, tile_width / 8, wall_h * 2 / 8}, {center_x - tile_width / 2, center_y - wall_y_off});
+
+            // left wall
+            if(x < 5 && !(x & 1) && y >= x && x < map_height - y)
+                screen.sprite({16, 0, tile_width / 8, wall_h * 2 / 8}, {center_x - tile_width / 2, center_y - wall_y_off});
+
+            // floor
+            screen.sprite({0, 2, tile_width / 8, tile_height / 8}, {center_x - tile_width / 2, center_y - tile_height / 2});
+
+            // bottom wall
+            if(y >= 5 && (y & 1) && x >= map_height - 1 - y && map_height - y <= map_width - x)
+                screen.sprite({4, 0, tile_width / 8, wall_h * 2 / 8}, {center_x - tile_width / 2, center_y - wall_y_off});
+
+            // right wall
+            if(x >= 5 && (x & 1) && y >= map_width - 1 - x && map_width - x <= map_height - y)
+                screen.sprite({8, 0, tile_width / 8, wall_h * 2 / 8}, {center_x - tile_width / 2, center_y - wall_y_off});
         }
     }
 }
