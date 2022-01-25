@@ -1,3 +1,4 @@
+#include "engine/api.hpp"
 #include "engine/engine.hpp"
 
 #include "level.hpp"
@@ -50,22 +51,42 @@ static const SpriteInfo sprites[] {
     {24, 0, 2, 7,  0, 48},
     {26, 0, 2, 7, 16, 48},
 
+    // hidden wall
+    {28, 0, 2, 2, 16,  8},
+    {30, 0, 2, 2,  0,  8},
+    {28, 2, 2, 2,  0, 16},
+    {30, 2, 2, 2, 16, 16},
+    // hidden wall + door
+    {28, 4, 2, 2, 16,  8},
+    {30, 4, 2, 2,  0,  8},
+    {28, 6, 2, 2,  0, 16},
+    {30, 6, 2, 2, 16, 16},
+
     // placeholder thing
     { 0, 0, 2, 2, 8, 16},
 };
 
+static const uint8_t wall_to_hidden[]{
+    0, // floor
+    4, // wall
+    4, // wall + window
+    5, // wall + door
+};
+
 static const int map_width = 10, map_height = 9;
 static const MapTile map[map_width * map_height]{
-    {1, {0, 0, 1, 1}, 16}, {1, {0, 0, 1, 0}}, {1, {0, 0, 2, 0}, 16}, {1, {0, 1, 1, 0}}, {1, {0, 0, 1, 0}}, {1, {0, 0, 1, 0}}, {1, {0, 0, 1, 0}, 16}, {1, {0, 0, 2, 0}, 16}, {1, {0, 0, 1, 0}, 16}, {1, {0, 1, 1, 0}},
+    {1, {0, 0, 1, 1}, 24}, {1, {0, 0, 1, 0}}, {1, {0, 0, 2, 0}, 24}, {1, {0, 1, 1, 0}}, {1, {0, 0, 1, 0}}, {1, {0, 0, 1, 0}}, {1, {0, 0, 1, 0}, 24}, {1, {0, 0, 2, 0}, 24}, {1, {0, 0, 1, 0}, 24}, {1, {0, 1, 1, 0}},
     {1, {0, 0, 0, 1}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 1, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 1, 0, 0}},
     {1, {0, 0, 0, 1}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 3, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 2, 0, 0}},
-    {1, {0, 0, 0, 1}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}, 16}, {1, {0, 1, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 1, 0, 0}},
+    {1, {0, 0, 0, 1}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}, 24}, {1, {0, 1, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 1, 0, 0}},
     {1, {0, 0, 1, 1}}, {1, {0, 0, 3, 0}}, {1, {0, 0, 1, 0}}, {1, {0, 1, 1, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 3, 0, 0}},
     {1, {0, 0, 0, 1}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 1, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 1, 0, 0}},
-    {1, {0, 0, 0, 1}}, {1, {0, 0, 0, 0}, 16}, {1, {0, 0, 0, 0}}, {1, {0, 3, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 2, 0, 0}},
+    {1, {0, 0, 0, 1}}, {1, {0, 0, 0, 0}, 24}, {1, {0, 0, 0, 0}}, {1, {0, 3, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 2, 0, 0}},
     {1, {0, 0, 0, 2}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 1, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 0, 0, 0}}, {1, {0, 1, 0, 0}},
-    {1, {1, 0, 0, 1}}, {1, {1, 0, 0, 0}}, {1, {2, 0, 0, 0}}, {1, {1, 1, 0, 0}}, {1, {1, 0, 0, 0}}, {1, {1, 0, 0, 0}}, {1, {1, 0, 0, 0}}, {1, {2, 0, 0, 0}, 16}, {1, {1, 0, 0, 0}}, {1, {1, 1, 0, 0}},
+    {1, {1, 0, 0, 1}}, {1, {1, 0, 0, 0}}, {1, {2, 0, 0, 0}}, {1, {1, 1, 0, 0}}, {1, {1, 0, 0, 0}}, {1, {1, 0, 0, 0}}, {1, {1, 0, 0, 0}}, {1, {2, 0, 0, 0}, 24}, {1, {1, 0, 0, 0}}, {1, {1, 1, 0, 0}},
 };
+
+static bool walls_hidden = false;
 
 Level::Level(Game *game) : game(game) {
     tiles = blit::Surface::load(asset_iso_tile);
@@ -76,6 +97,8 @@ Level::~Level() {
 
 void Level::update(uint32_t time) {
 
+    if(blit::buttons.released & blit::Button::Y)
+        walls_hidden = !walls_hidden;
 }
 
 void Level::render() {
@@ -93,6 +116,16 @@ void Level::render() {
         screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {x - sprite.center_x, y - sprite.center_y});
     };
 
+    auto draw_wall = [&draw_sprite](int x, int y, const MapTile &tile, WallSide side) {
+        if(tile.walls[side]) {
+            int base_sprite = tile.walls[side];
+            if(walls_hidden)
+                base_sprite = wall_to_hidden[base_sprite];
+
+            draw_sprite(x, y, sprites[base_sprite * 4 + side]);
+        }
+    };
+
     for(int x = 0; x < map_width; x++) {
         for(int y = 0; y < map_height; y++) {
             int center_x = offset_x + x * tile_width / 2 - y * tile_width / 2;
@@ -102,13 +135,9 @@ void Level::render() {
 
             // 0 could be a valid floor sprite, but not a wall sprite (as it's the floor)
 
-            // top wall
-            if(tile.walls[Side_Top])
-                draw_sprite(center_x, center_y, sprites[tile.walls[Side_Top] * 4 + Side_Top]);
-
-            // left wall
-            if(tile.walls[Side_Left])
-                draw_sprite(center_x, center_y, sprites[tile.walls[Side_Left] * 4 + Side_Left]);
+            // top/left walls
+            draw_wall(center_x, center_y, tile, Side_Top);
+            draw_wall(center_x, center_y, tile, Side_Left);
 
             // floor
             if(tile.floor)
@@ -117,13 +146,9 @@ void Level::render() {
             if(tile.object)
                 draw_sprite(center_x, center_y, sprites[tile.object]);
 
-            // bottom wall
-            if(tile.walls[Side_Bottom])
-                draw_sprite(center_x, center_y, sprites[tile.walls[Side_Bottom] * 4 + Side_Bottom]);
-
-            // right wall
-            if(tile.walls[Side_Right])
-                draw_sprite(center_x, center_y, sprites[tile.walls[Side_Right] * 4 + Side_Right]);
+            // bottom/right walls
+            draw_wall(center_x, center_y, tile, Side_Bottom);
+            draw_wall(center_x, center_y, tile, Side_Right);
         }
     }
 }
