@@ -26,14 +26,14 @@ enum WallSide {
 static const int tile_width = 32, tile_height = 16;
 
 static const SpriteInfo sprites[] {
-    { 0, 2, 4, 2, 16,  8}, // floor
+    { 0, 4, 4, 2, 16,  8}, // floor
     {},
     {}, // don't need to rotate the floor
     {},
-    { 4, 0, 2, 4, 16, 24}, // bottom wall
-    {10, 0, 2, 4,  0, 24}, // right wall
-    {14, 0, 2, 4,  0, 24}, // top wall
-    {16, 0, 2, 4, 16, 24}, // left wall
+    { 4, 0, 2, 6, 16, 40}, // bottom wall
+    { 6, 0, 2, 6,  0, 40}, // right wall
+    { 8, 0, 2, 6,  0, 40}, // top wall
+    {10, 0, 2, 6, 16, 40}, // left wall
 };
 
 static const int map_width = 10, map_height = 10;
@@ -68,7 +68,7 @@ void Level::render() {
     screen.clear();
 
     int offset_x = screen.bounds.w / 2;
-    int offset_y = 24;
+    int offset_y = 40;
 
     screen.sprites = tiles;
 
