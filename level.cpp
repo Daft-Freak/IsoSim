@@ -27,7 +27,7 @@ enum WallSide {
 static const int tile_width = 32, tile_height = 16;
 
 static const SpriteInfo sprites[] {
-    { 0, 5, 4, 2, 16,  8}, // floor
+    { 0, 4, 4, 3, 16, 16}, // floor
     {},
     {}, // don't need to rotate the floor
     {},
@@ -97,12 +97,6 @@ void Level::render() {
         for(int y = 0; y < map_height; y++) {
             int center_x = offset_x + x * tile_width / 2 - y * tile_width / 2;
             int center_y = offset_y + y * tile_height / 2 + x * tile_height / 2; // - z
-
-            // palette swap
-            if((x + y) & 1)
-                tiles->palette[3] = {0x20, 0x20, 0x20};
-            else
-                tiles->palette[3] = {0xDF, 0xDF, 0xDF};
 
             auto &tile = map[x + y * map_width];
 
