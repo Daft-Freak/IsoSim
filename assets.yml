@@ -1,3 +1,5 @@
 assets.cpp:
   prefix: 'asset_'
-  assets/iso-tile.png: '{filename}'
+  assets/iso-tile.png:
+    name: '{filename}'
+    palette: assets/palette.png # floor/wall colours so we can swap them easily
