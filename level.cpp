@@ -221,7 +221,7 @@ static const MapTile map[map_width * map_height]{
     {1, {0, 0, 0, 0},  0},
     {1, {0, 0, 0, 0},  0},
     {1, {0, 0, 0, 0},  0},
-    {1, {0, 1, 0, 0},  0},
+    {1, {0, 1, 0, 0}, 31},
     // Y = 8
     {1, {1, 0, 0, 1},  0,   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
     {1, {1, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
@@ -230,7 +230,7 @@ static const MapTile map[map_width * map_height]{
     {1, {1, 0, 0, 0},  0},
     {1, {1, 0, 0, 0},  0},
     {1, {1, 0, 0, 0},  0},
-    {1, {2, 0, 0, 0}, 30},
+    {1, {2, 0, 0, 0},  0},
     {1, {1, 0, 0, 0},  0},
     {1, {1, 1, 0, 0},  0},
 };
