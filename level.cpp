@@ -33,39 +33,89 @@ enum WallSide {
 static const int tile_width = 32, tile_height = 16;
 
 static const SpriteInfo sprites[] {
-    { 0, 4, 4, 3, 16, 16}, // floor
+    { 0,  3, 4, 3, 16, 16}, // floor
     {},
     {}, // don't need to rotate the floor
     {},
 
     // wall
-    { 4, 1, 2, 6, 16, 40}, // bottom
-    { 6, 1, 2, 6,  0, 40}, // right
-    { 8, 0, 2, 6,  0, 48}, // top
-    {10, 0, 2, 6, 16, 48}, // left
+    { 4,  0, 2, 6, 16, 40}, // bottom
+    { 6,  0, 2, 6,  0, 40}, // right
+    { 8,  0, 2, 6,  0, 48}, // top
+    {10,  0, 2, 6, 16, 48}, // left
 
     // wall + window
-    {12, 1, 2, 6, 16, 40},
-    {14, 1, 2, 6,  0, 40},
-    {16, 0, 2, 6,  0, 48},
-    {18, 0, 2, 6, 16, 48},
+    {12,  0, 2, 6, 16, 40},
+    {14,  0, 2, 6,  0, 40},
+    {16,  0, 2, 6,  0, 48},
+    {18,  0, 2, 6, 16, 48},
 
     // wall + door
-    {20, 1, 2, 6, 16, 40},
-    {22, 1, 2, 6,  0, 40},
-    {24, 0, 2, 6,  0, 48},
-    {26, 0, 2, 6, 16, 48},
+    {20,  0, 2, 6, 16, 40},
+    {22,  0, 2, 6,  0, 40},
+    {24,  0, 2, 6,  0, 48},
+    {26,  0, 2, 6, 16, 48},
 
     // hidden wall
-    {28, 0, 2, 2, 16,  8},
-    {30, 0, 2, 2,  0,  8},
-    {28, 2, 2, 2,  0, 16},
-    {30, 2, 2, 2, 16, 16},
+    {28,  0, 2, 2, 16,  8},
+    {30,  0, 2, 2,  0,  8},
+    {28,  2, 2, 2,  0, 16},
+    {30,  2, 2, 2, 16, 16},
     // hidden wall + door
-    {28, 4, 2, 2, 16,  8},
-    {30, 4, 2, 2,  0,  8},
-    {28, 6, 2, 2,  0, 16},
-    {30, 6, 2, 2, 16, 16},
+    {28,  4, 2, 2, 16,  8},
+    {30,  4, 2, 2,  0,  8},
+    {28,  6, 2, 2,  0, 16},
+    {30,  6, 2, 2, 16, 16},
+
+    // furniture may need some adjusting
+
+    // bed　(24)
+    { 0,  6, 6, 4, 16, 25},
+    { 6,  6, 6, 4, 32, 25},
+    {12,  6, 6, 4, 16, 24},
+    {18,  6, 6, 4, 32, 24},
+
+    // tv (28)
+    {24,  6, 3, 3, 24, 24},
+    {27,  8, 3, 3,  0, 24},
+    { 0, 10, 3, 3, 18, 24},
+    { 3, 10, 3, 3,  2, 25},
+
+    // kitchen sink (32)
+    { 6, 10, 3, 3, 12, 22},
+    { 9, 10, 3, 3, 16, 19},
+    {12, 10, 3, 3, 17, 19},
+    {15, 10, 3, 3, 13, 17},
+
+    // oven (36)
+    {18, 10, 3, 3, 12, 22},
+    {21, 10, 3, 3, 16, 19},
+    {24, 10, 3, 3, 17, 19},
+    {28, 11, 3, 3, 13, 17},
+
+    // fridge (40)
+    { 0, 13, 3, 5,  8, 38},
+    { 3, 13, 3, 5, 16, 38},
+    { 6, 13, 3, 5, 16, 32},
+    { 9, 13, 3, 5,  8, 32},
+
+    // shower (44)
+    {12, 13, 4, 6, 16, 40},
+    {16, 13, 4, 6, 16, 40},
+    {20, 13, 4, 6, 16, 40},
+    {24, 13, 4, 6, 16, 40},
+
+    // bathroom sink (48)
+    {28, 14, 2, 3,  2, 24},
+    {30, 14, 2, 3, 14, 24},
+    {28, 17, 2, 3, 14, 16},
+    {30, 17, 2, 3,  2, 16},
+
+    // toilet (52)
+    { 0, 18, 3, 3,  8, 20},
+    { 3, 18, 3, 3, 16, 20},
+    { 6, 18, 3, 2, 16, 12},
+    { 9, 18, 3, 2,  8, 12},
 
     // placeholder thing
     { 0, 0, 2, 2, 8, 16},
@@ -85,15 +135,15 @@ static const blit::Pen default_col{}, yellow_col{255, 255, 128}, cyan_col{200, 2
 static const int map_width = 10, map_height = 9;
 static const MapTile map[map_width * map_height]{
     // Y = 0
-    {1, {0, 0, 1, 1}, 24,  grey60_col, {default_col, default_col, off_white_col, off_white_col}},
+    {1, {0, 0, 1, 1}, 44,  grey60_col, {default_col, default_col, off_white_col, off_white_col}},
     {1, {0, 0, 1, 0},  0, grey100_col, {default_col, default_col, off_white_col,   default_col}},
-    {1, {0, 0, 2, 0}, 24,  grey60_col, {default_col, default_col, off_white_col,   default_col}},
+    {1, {0, 0, 2, 0}, 52,  grey60_col, {default_col, default_col, off_white_col,   default_col}},
     {1, {0, 1, 1, 0},  0, grey100_col, {default_col,  yellow_col, off_white_col,   default_col}},
     {1, {0, 0, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
     {1, {0, 0, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
-    {1, {0, 0, 1, 0}, 24, default_col, {default_col, default_col,    yellow_col,   default_col}},
-    {1, {0, 0, 2, 0}, 24, default_col, {default_col, default_col,    yellow_col,   default_col}},
-    {1, {0, 0, 1, 0}, 24, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 0, 1, 0}, 36, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 0, 2, 0}, 32, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 0, 1, 0}, 40, default_col, {default_col, default_col,    yellow_col,   default_col}},
     {1, {0, 1, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
     // Y = 1
     {1, {0, 0, 0, 1},  0, grey100_col, {default_col, default_col,   default_col, off_white_col}},
@@ -120,7 +170,7 @@ static const MapTile map[map_width * map_height]{
     // Y = 3
     {1, {0, 0, 0, 1},  0, grey100_col, {default_col, default_col,   default_col, off_white_col}},
     {1, {0, 0, 0, 0},  0,  grey60_col},
-    {1, {0, 0, 0, 0}, 24, grey100_col},
+    {1, {0, 0, 0, 0}, 50, grey100_col},
     {1, {0, 1, 0, 0},  0,  grey60_col, {default_col,  yellow_col,   default_col,   default_col}},
     {1, {0, 0, 0, 0},  0},
     {1, {0, 0, 0, 0},  0},
@@ -152,7 +202,7 @@ static const MapTile map[map_width * map_height]{
     {1, {0, 1, 0, 0},  0},
     // Y = 6
     {1, {0, 0, 0, 1},  0,   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
-    {1, {0, 0, 0, 0}, 24,   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {0, 0, 0, 0}, 25,   green_col, {default_col, default_col,      cyan_col,   default_col}},
     {1, {0, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
     {1, {0, 3, 0, 0},  0,   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
     {1, {0, 0, 0, 0},  0},
@@ -180,7 +230,7 @@ static const MapTile map[map_width * map_height]{
     {1, {1, 0, 0, 0},  0},
     {1, {1, 0, 0, 0},  0},
     {1, {1, 0, 0, 0},  0},
-    {1, {2, 0, 0, 0}, 24},
+    {1, {2, 0, 0, 0}, 30},
     {1, {1, 0, 0, 0},  0},
     {1, {1, 1, 0, 0},  0},
 };
