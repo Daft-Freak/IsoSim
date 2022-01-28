@@ -330,8 +330,17 @@ void Level::render() {
             if(tile.object)
                 draw_sprite(center_x, center_y, sprites[tile.object]);
 
-            // bottom/right walls
             draw_wall(center_x, center_y, tile, Side_Bottom);
+        }
+        
+        // draw right walls after drawing entire line (for objects that cover multiple tiles on the y axis)
+        // multiple x tiles is a bit broken
+        for(int y = 0; y < map_height; y++) {
+            int center_x = offset_x + x * tile_width / 2 - y * tile_width / 2;
+            int center_y = offset_y + y * tile_height / 2 + x * tile_height / 2; // - z
+
+            auto &tile = map[x + y * map_width];
+
             draw_wall(center_x, center_y, tile, Side_Right);
         }
     }
