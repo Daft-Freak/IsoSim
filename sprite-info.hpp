@@ -1,0 +1,20 @@
+#pragma once
+
+#include <cstdint>
+
+struct SpriteInfo {
+    uint8_t sheet_x, sheet_y, sheet_w, sheet_h; // in 8x8 tiles
+    uint8_t center_x, center_y; // in pixels
+};
+
+enum WallSide {
+    Side_Bottom = 0,
+    Side_Right,
+    Side_Top,
+    Side_Left
+};
+
+// isometric sprites from "iso-tile"
+extern const SpriteInfo sprites[];
+
+extern const uint8_t wall_to_hidden[];

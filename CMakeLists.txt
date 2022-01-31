@@ -5,6 +5,7 @@ project(isosim)
 set(PROJECT_SOURCE
   game.cpp
   level.cpp
+  sprite-info.cpp
 )
 
 set(PROJECT_DISTRIBS LICENSE README.md)

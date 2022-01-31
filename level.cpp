@@ -6,12 +6,9 @@
 #include "level.hpp"
 
 #include "assets.hpp"
+#include "sprite-info.hpp"
 #include "game.hpp"
 
-struct SpriteInfo {
-    uint8_t sheet_x, sheet_y, sheet_w, sheet_h; // in 8x8 tiles
-    uint8_t center_x, center_y; // in pixels
-};
 
 struct MapTile {
     uint8_t floor;
@@ -22,111 +19,9 @@ struct MapTile {
     blit::Pen wall_colour[4] = {};
 };
 
-enum WallSide {
-    Side_Bottom = 0,
-    Side_Right,
-    Side_Top,
-    Side_Left
-};
-
 // base tile size
 static const int tile_width = 32, tile_height = 16;
 
-static const SpriteInfo sprites[] {
-    { 0,  3, 4, 3, 16, 16}, // floor
-    {},
-    {}, // don't need to rotate the floor
-    {},
-
-    // wall
-    { 4,  0, 2, 6, 16, 40}, // bottom
-    { 6,  0, 2, 6,  0, 40}, // right
-    { 8,  0, 2, 6,  0, 48}, // top
-    {10,  0, 2, 6, 16, 48}, // left
-
-    // wall + window
-    {12,  0, 2, 6, 16, 40},
-    {14,  0, 2, 6,  0, 40},
-    {16,  0, 2, 6,  0, 48},
-    {18,  0, 2, 6, 16, 48},
-
-    // wall + door
-    {20,  0, 2, 6, 16, 40},
-    {22,  0, 2, 6,  0, 40},
-    {24,  0, 2, 6,  0, 48},
-    {26,  0, 2, 6, 16, 48},
-
-    // hidden wall
-    {28,  0, 2, 2, 16,  8},
-    {30,  0, 2, 2,  0,  8},
-    {28,  2, 2, 2,  0, 16},
-    {30,  2, 2, 2, 16, 16},
-    // hidden wall + door
-    {28,  4, 2, 2, 16,  8},
-    {30,  4, 2, 2,  0,  8},
-    {28,  6, 2, 2,  0, 16},
-    {30,  6, 2, 2, 16, 16},
-
-    // furniture may need some adjusting
-
-    // bed　(24)
-    { 0,  6, 6, 4, 16, 25},
-    { 6,  6, 6, 4, 32, 25},
-    {12,  6, 6, 4, 16, 24},
-    {18,  6, 6, 4, 32, 24},
-
-    // tv (28)
-    {24,  6, 3, 3, 24, 24},
-    {27,  8, 3, 3,  0, 24},
-    { 0, 10, 3, 3, 18, 24},
-    { 3, 10, 3, 3,  2, 25},
-
-    // kitchen sink (32)
-    { 6, 10, 3, 3, 12, 22},
-    { 9, 10, 3, 3, 16, 19},
-    {12, 10, 3, 3, 17, 19},
-    {15, 10, 3, 3, 13, 17},
-
-    // oven (36)
-    {18, 10, 3, 3, 12, 22},
-    {21, 10, 3, 3, 16, 19},
-    {24, 10, 3, 3, 17, 19},
-    {28, 11, 3, 3, 13, 17},
-
-    // fridge (40)
-    { 0, 13, 3, 5,  8, 38},
-    { 3, 13, 3, 5, 16, 38},
-    { 6, 13, 3, 5, 16, 32},
-    { 9, 13, 3, 5,  8, 32},
-
-    // shower (44)
-    {12, 13, 4, 6, 16, 40},
-    {16, 13, 4, 6, 16, 40},
-    {20, 13, 4, 6, 16, 40},
-    {24, 13, 4, 6, 16, 40},
-
-    // bathroom sink (48)
-    {28, 14, 2, 3,  2, 24},
-    {30, 14, 2, 3, 14, 24},
-    {28, 17, 2, 3, 14, 16},
-    {30, 17, 2, 3,  2, 16},
-
-    // toilet (52)
-    { 0, 18, 3, 3,  8, 20},
-    { 3, 18, 3, 3, 16, 20},
-    { 6, 18, 3, 2, 16, 12},
-    { 9, 18, 3, 2,  8, 12},
-
-    // placeholder thing
-    { 0, 0, 2, 2, 8, 16},
-};
-
-static const uint8_t wall_to_hidden[]{
-    0, // floor
-    4, // wall
-    4, // wall + window
-    5, // wall + door
-};
 
 // TODO: this is getting silly, need something to edit this with
 static const blit::Pen default_col{}, yellow_col{255, 255, 128}, cyan_col{200, 255, 255}, green_col{50, 100, 50},
