@@ -19,10 +19,6 @@ struct MapTile {
     blit::Pen wall_colour[4] = {};
 };
 
-// base tile size
-static const int tile_width = 32, tile_height = 16;
-
-
 // TODO: this is getting silly, need something to edit this with
 static const blit::Pen default_col{}, yellow_col{255, 255, 128}, cyan_col{200, 255, 255}, green_col{50, 100, 50},
                        off_white_col{240, 240, 240}, grey60_col{60, 60, 60}, grey100_col{100, 100, 100};
@@ -130,6 +126,20 @@ static const MapTile map[map_width * map_height]{
     {1, {1, 1, 0, 0},  0},
 };
 
+// base tile size
+static const int tile_width = 32, tile_height = 16;
+
+blit::Point to_screen_pos(int x, int y, int z = 0) {
+    return {x * tile_width / 2 - y * tile_width / 2, y * tile_height / 2 + x * tile_height / 2 - z};
+}
+
+blit::Point from_screen_pos(blit::Point screen) {
+    return {
+        (screen.x / 2 + screen.y + tile_height / 2) / tile_height,
+        (-screen.x / 2 + screen.y + tile_height / 2) / tile_height
+    };
+}
+
 static bool walls_hidden = false;
 
 Level::Level(Game *game) : game(game) {
@@ -147,12 +157,12 @@ void Level::update(uint32_t time) {
 
 void Level::render() {
     using blit::screen;
+    using blit::Point;
 
     screen.pen = {0x63, 0x9b, 0xff}; // "sky" colour
     screen.clear();
 
-    int offset_x = screen.bounds.w / 2;
-    int offset_y = 40;
+    Point offset(screen.bounds.w / 2, 40);
 
     screen.sprites = tiles;
 
@@ -160,11 +170,11 @@ void Level::render() {
     blit::Pen orig_cols[9];
     memcpy(orig_cols, tiles->palette, sizeof(orig_cols));
 
-    auto draw_sprite = [](int x, int y, const SpriteInfo &sprite){
-        screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {x - sprite.center_x, y - sprite.center_y});
+    auto draw_sprite = [](Point pos, const SpriteInfo &sprite){
+        screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {pos.x - sprite.center_x, pos.y - sprite.center_y});
     };
 
-    auto draw_wall = [&draw_sprite, &orig_cols](int x, int y, const MapTile &tile, WallSide side) {
+    auto draw_wall = [&draw_sprite, &orig_cols](Point pos, const MapTile &tile, WallSide side) {
         if(tile.walls[side]) {
             int base_sprite = tile.walls[side];
             if(walls_hidden)
@@ -186,7 +196,7 @@ void Level::render() {
                 wall_col.b * (col_mul_b[side] + 1) / 256
             };
 
-            draw_sprite(x, y, sprites[base_sprite * 4 + side]);
+            draw_sprite(pos, sprites[base_sprite * 4 + side]);
 
             screen.sprites->palette[5 + side] = orig_cols[5 + side];
         }
@@ -194,16 +204,15 @@ void Level::render() {
 
     for(int x = 0; x < map_width; x++) {
         for(int y = 0; y < map_height; y++) {
-            int center_x = offset_x + x * tile_width / 2 - y * tile_width / 2;
-            int center_y = offset_y + y * tile_height / 2 + x * tile_height / 2; // - z
+            auto center_pos = to_screen_pos(x, y) + offset;
 
             auto &tile = map[x + y * map_width];
 
             // 0 could be a valid floor sprite, but not a wall sprite (as it's the floor)
 
             // top/left walls
-            draw_wall(center_x, center_y, tile, Side_Top);
-            draw_wall(center_x, center_y, tile, Side_Left);
+            draw_wall(center_pos, tile, Side_Top);
+            draw_wall(center_pos, tile, Side_Left);
 
             // floor
             if(tile.floor) {
@@ -216,27 +225,26 @@ void Level::render() {
                 tiles->palette[3] = {floor_col.r * 156 / 256, floor_col.g * 156 / 256, floor_col.b * 156 / 256}; // shading
                 tiles->palette[4] = {floor_col.r * 103 / 256, floor_col.g * 103 / 256, floor_col.b * 103 / 256}; // more shading
 
-                draw_sprite(center_x, center_y, sprites[tile.floor - 1]);
+                draw_sprite(center_pos, sprites[tile.floor - 1]);
 
                 for(int i = 1; i < 5; i++)
                     tiles->palette[i] = orig_cols[i];
             }
 
             if(tile.object)
-                draw_sprite(center_x, center_y, sprites[tile.object]);
+                draw_sprite(center_pos, sprites[tile.object]);
 
-            draw_wall(center_x, center_y, tile, Side_Bottom);
+            draw_wall(center_pos, tile, Side_Bottom);
         }
         
         // draw right walls after drawing entire line (for objects that cover multiple tiles on the y axis)
         // multiple x tiles is a bit broken
         for(int y = 0; y < map_height; y++) {
-            int center_x = offset_x + x * tile_width / 2 - y * tile_width / 2;
-            int center_y = offset_y + y * tile_height / 2 + x * tile_height / 2; // - z
+            auto center_pos = to_screen_pos(x, y) + offset;
 
             auto &tile = map[x + y * map_width];
 
-            draw_wall(center_x, center_y, tile, Side_Right);
+            draw_wall(center_pos, tile, Side_Right);
         }
     }
 }
