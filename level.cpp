@@ -13,7 +13,7 @@
 struct MapTile {
     uint8_t floor;
     uint8_t walls[4]; // bottom, right, top, left
-    uint8_t object = 0;
+    uint8_t entity = 0;
 
     blit::Pen floor_colour = {};
     blit::Pen wall_colour[4] = {};
@@ -24,17 +24,17 @@ static const blit::Pen default_col{}, yellow_col{255, 255, 128}, cyan_col{200, 2
                        off_white_col{240, 240, 240}, grey60_col{60, 60, 60}, grey100_col{100, 100, 100};
 
 static const int map_width = 10, map_height = 9;
-static const MapTile map[map_width * map_height]{
+static MapTile map[map_width * map_height]{
     // Y = 0
-    {1, {0, 0, 1, 1}, 44,  grey60_col, {default_col, default_col, off_white_col, off_white_col}},
+    {1, {0, 0, 1, 1},  0,  grey60_col, {default_col, default_col, off_white_col, off_white_col}},
     {1, {0, 0, 1, 0},  0, grey100_col, {default_col, default_col, off_white_col,   default_col}},
-    {1, {0, 0, 2, 0}, 52,  grey60_col, {default_col, default_col, off_white_col,   default_col}},
+    {1, {0, 0, 2, 0},  0,  grey60_col, {default_col, default_col, off_white_col,   default_col}},
     {1, {0, 1, 1, 0},  0, grey100_col, {default_col,  yellow_col, off_white_col,   default_col}},
     {1, {0, 0, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
     {1, {0, 0, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
-    {1, {0, 0, 1, 0}, 36, default_col, {default_col, default_col,    yellow_col,   default_col}},
-    {1, {0, 0, 2, 0}, 32, default_col, {default_col, default_col,    yellow_col,   default_col}},
-    {1, {0, 0, 1, 0}, 40, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 0, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 0, 2, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 0, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
     {1, {0, 1, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
     // Y = 1
     {1, {0, 0, 0, 1},  0, grey100_col, {default_col, default_col,   default_col, off_white_col}},
@@ -61,7 +61,7 @@ static const MapTile map[map_width * map_height]{
     // Y = 3
     {1, {0, 0, 0, 1},  0, grey100_col, {default_col, default_col,   default_col, off_white_col}},
     {1, {0, 0, 0, 0},  0,  grey60_col},
-    {1, {0, 0, 0, 0}, 50, grey100_col},
+    {1, {0, 0, 0, 0},  0, grey100_col},
     {1, {0, 1, 0, 0},  0,  grey60_col, {default_col,  yellow_col,   default_col,   default_col}},
     {1, {0, 0, 0, 0},  0},
     {1, {0, 0, 0, 0},  0},
@@ -93,7 +93,7 @@ static const MapTile map[map_width * map_height]{
     {1, {0, 1, 0, 0},  0},
     // Y = 6
     {1, {0, 0, 0, 1},  0,   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
-    {1, {0, 0, 0, 0}, 25,   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {0, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
     {1, {0, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
     {1, {0, 3, 0, 0},  0,   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
     {1, {0, 0, 0, 0},  0},
@@ -112,7 +112,7 @@ static const MapTile map[map_width * map_height]{
     {1, {0, 0, 0, 0},  0},
     {1, {0, 0, 0, 0},  0},
     {1, {0, 0, 0, 0},  0},
-    {1, {0, 1, 0, 0}, 31},
+    {1, {0, 1, 0, 0},  0},
     // Y = 8
     {1, {1, 0, 0, 1},  0,   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
     {1, {1, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
@@ -142,8 +142,76 @@ blit::Point from_screen_pos(blit::Point screen) {
 
 static bool walls_hidden = false;
 
+// entity stuff
+
+class Entity {
+public:
+    Entity() = default;
+
+    Entity(blit::Point pos, unsigned int sprite_index) : sprite_index(sprite_index) {
+        set_tile_position(pos);
+    };
+
+    blit::Point get_position() const {
+        return position;
+    }
+
+    void set_position(blit::Point p) {
+        position = p;
+    }
+
+    blit::Point get_tile_position() const {
+        return position / 16;
+    }
+
+    blit::Point get_offset_in_tile() const {
+        // assuming 32x16
+        int x = position.x % 16;
+        int y = position.y % 16;
+        return {x - y + 16, (x + y) / 2};
+    }
+
+    void set_tile_position(blit::Point p) {
+        position = p * 16 + blit::Point(8, 8);
+    }
+
+    unsigned int get_sprite_index() const {
+        return sprite_index;
+    }
+
+private:
+    blit::Point position; // 16ths of a tile
+    blit::Size size = {1, 1};
+
+    unsigned int sprite_index = 0;
+};
+
+Entity entities[] {
+    {{0, 0}, 44}, // shower
+    {{2, 0}, 52}, // toilet
+    {{6, 0}, 36}, // oven
+    {{7, 0}, 32}, // kitchen sink
+    {{8, 0}, 40}, // fridge
+
+    {{2, 3}, 50}, // bathroom sink
+
+    {{1, 6}, 25}, // bed
+
+    {{9, 7}, 31}, // tv
+
+    {{1, 1}, 56}
+};
+
 Level::Level(Game *game) : game(game) {
     tiles = blit::Surface::load(asset_iso_tile);
+
+    // put entities where they should be
+    unsigned int i = 0;
+    for(auto &ent : entities) {
+        auto tile_pos = ent.get_tile_position();
+        map[tile_pos.x + tile_pos.y * map_width].entity = ++i;
+    }
+    
 }
 
 Level::~Level() {
@@ -153,6 +221,18 @@ void Level::update(uint32_t time) {
 
     if(blit::buttons.released & blit::Button::Y)
         walls_hidden = !walls_hidden;
+
+    // test moving
+    // needs to handle tile already being full
+    // and also probably be handled in set_position
+    auto old_tile_pos = entities[8].get_tile_position();
+    entities[8].set_position({72 + int(std::sin(time / 600.0f) * 52), 72 + int(std::cos(time / 600.0f) * 32)});
+    auto new_tile_pos = entities[8].get_tile_position();
+
+    if(new_tile_pos != old_tile_pos) {
+        map[old_tile_pos.x + old_tile_pos.y * map_width].entity = 0;
+        map[new_tile_pos.x + new_tile_pos.y * map_width].entity = 9;
+    }
 }
 
 void Level::render() {
@@ -231,8 +311,10 @@ void Level::render() {
                     tiles->palette[i] = orig_cols[i];
             }
 
-            if(tile.object)
-                draw_sprite(center_pos, sprites[tile.object]);
+            if(tile.entity) {
+                auto &ent = entities[tile.entity - 1];
+                draw_sprite(center_pos - Point(tile_width / 2, tile_height / 2) + ent.get_offset_in_tile(), sprites[ent.get_sprite_index()]);
+            }
 
             draw_wall(center_pos, tile, Side_Bottom);
         }
