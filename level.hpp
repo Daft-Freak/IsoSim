@@ -1,7 +1,7 @@
 #pragma once
 
 #include "game-state.hpp"
-#include "surface-helper.hpp"
+#include "world.hpp"
 
 class Game;
 
@@ -16,5 +16,5 @@ public:
 private:
     Game *game;
 
-    OwnedSurface tiles;
+    World world;
 };
