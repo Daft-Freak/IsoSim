@@ -114,10 +114,20 @@ World::World() : map{
 } {
     tiles = blit::Surface::load(asset_iso_tile);
 
-    // put entities where they should be
-    unsigned int i = 0;
-    for(auto &ent : entities)
-        add_entity(ent.get_tile_position(), i++);
+    // test entity data
+    entities.emplace_back(*this, entities.size(), blit::Point{0, 0}, 44); // shower
+    entities.emplace_back(*this, entities.size(), blit::Point{2, 0}, 52); // toilet
+    entities.emplace_back(*this, entities.size(), blit::Point{6, 0}, 36); // oven
+    entities.emplace_back(*this, entities.size(), blit::Point{7, 0}, 32); // kitchen sink
+    entities.emplace_back(*this, entities.size(), blit::Point{8, 0}, 40); // fridge
+
+    entities.emplace_back(*this, entities.size(), blit::Point{2, 3}, 50); // bathroom sink
+
+    entities.emplace_back(*this, entities.size(), blit::Point{1, 6}, 25); // bed
+
+    entities.emplace_back(*this, entities.size(), blit::Point{9, 7}, 31); // tv
+
+    entities.emplace_back(*this, entities.size(), blit::Point{1, 1}, 56); // test thing
 }
 
 void World::render() {
@@ -215,16 +225,7 @@ void World::render() {
 
 void World::update(uint32_t time) {
     // test moving
-    // needs to handle tile already being full
-    // and also probably be handled in set_position
-    auto old_tile_pos = entities[8].get_tile_position();
     entities[8].set_position({72 + int(std::sin(time / 600.0f) * 52), 72 + int(std::cos(time / 600.0f) * 32)});
-    auto new_tile_pos = entities[8].get_tile_position();
-
-    if(new_tile_pos != old_tile_pos) {
-        remove_entity(old_tile_pos, 8);
-        add_entity(new_tile_pos, 8);
-    }
 }
 
 bool World::add_entity(blit::Point tile_pos, unsigned int entity) {

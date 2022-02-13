@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "graphics/surface.hpp"
 #include "types/point.hpp"
 
@@ -41,21 +43,7 @@ private:
     static const int map_width = 10, map_height = 9;
     MapTile map[map_width * map_height];
 
-    Entity entities[9] {
-        {{0, 0}, 44}, // shower
-        {{2, 0}, 52}, // toilet
-        {{6, 0}, 36}, // oven
-        {{7, 0}, 32}, // kitchen sink
-        {{8, 0}, 40}, // fridge
-
-        {{2, 3}, 50}, // bathroom sink
-
-        {{1, 6}, 25}, // bed
-
-        {{9, 7}, 31}, // tv
-
-        {{1, 1}, 56}
-    };
+    std::vector<Entity> entities;
 
     bool walls_hidden = false;
 };
