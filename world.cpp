@@ -13,104 +13,104 @@ static const blit::Pen default_col{}, yellow_col{255, 255, 128}, cyan_col{200, 2
 
 World::World() : map{
     // Y = 0
-    {1, {0, 0, 1, 1},  0,  grey60_col, {default_col, default_col, off_white_col, off_white_col}},
-    {1, {0, 0, 1, 0},  0, grey100_col, {default_col, default_col, off_white_col,   default_col}},
-    {1, {0, 0, 2, 0},  0,  grey60_col, {default_col, default_col, off_white_col,   default_col}},
-    {1, {0, 1, 1, 0},  0, grey100_col, {default_col,  yellow_col, off_white_col,   default_col}},
-    {1, {0, 0, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
-    {1, {0, 0, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
-    {1, {0, 0, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
-    {1, {0, 0, 2, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
-    {1, {0, 0, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
-    {1, {0, 1, 1, 0},  0, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 0, 1, 1},  {},  grey60_col, {default_col, default_col, off_white_col, off_white_col}},
+    {1, {0, 0, 1, 0},  {}, grey100_col, {default_col, default_col, off_white_col,   default_col}},
+    {1, {0, 0, 2, 0},  {},  grey60_col, {default_col, default_col, off_white_col,   default_col}},
+    {1, {0, 1, 1, 0},  {}, grey100_col, {default_col,  yellow_col, off_white_col,   default_col}},
+    {1, {0, 0, 1, 0},  {}, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 0, 1, 0},  {}, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 0, 1, 0},  {}, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 0, 2, 0},  {}, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 0, 1, 0},  {}, default_col, {default_col, default_col,    yellow_col,   default_col}},
+    {1, {0, 1, 1, 0},  {}, default_col, {default_col, default_col,    yellow_col,   default_col}},
     // Y = 1
-    {1, {0, 0, 0, 1},  0, grey100_col, {default_col, default_col,   default_col, off_white_col}},
-    {1, {0, 0, 0, 0},  0,  grey60_col},
-    {1, {0, 0, 0, 0},  0, grey100_col},
-    {1, {0, 1, 0, 0},  0,  grey60_col, {default_col,  yellow_col,   default_col,   default_col}},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 1, 0, 0},  0},
+    {1, {0, 0, 0, 1},  {}, grey100_col, {default_col, default_col,   default_col, off_white_col}},
+    {1, {0, 0, 0, 0},  {},  grey60_col},
+    {1, {0, 0, 0, 0},  {}, grey100_col},
+    {1, {0, 1, 0, 0},  {},  grey60_col, {default_col,  yellow_col,   default_col,   default_col}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 1, 0, 0}},
     // Y = 2
-    {1, {0, 0, 0, 1},  0,  grey60_col, {default_col, default_col,   default_col, off_white_col}},
-    {1, {0, 0, 0, 0},  0, grey100_col},
-    {1, {0, 0, 0, 0},  0,  grey60_col},
-    {1, {0, 3, 0, 0},  0, grey100_col, {default_col,  yellow_col,   default_col,   default_col}},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 2, 0, 0},  0},
+    {1, {0, 0, 0, 1},  {},  grey60_col, {default_col, default_col,   default_col, off_white_col}},
+    {1, {0, 0, 0, 0},  {}, grey100_col},
+    {1, {0, 0, 0, 0},  {},  grey60_col},
+    {1, {0, 3, 0, 0},  {}, grey100_col, {default_col,  yellow_col,   default_col,   default_col}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 2, 0, 0}},
     // Y = 3
-    {1, {0, 0, 0, 1},  0, grey100_col, {default_col, default_col,   default_col, off_white_col}},
-    {1, {0, 0, 0, 0},  0,  grey60_col},
-    {1, {0, 0, 0, 0},  0, grey100_col},
-    {1, {0, 1, 0, 0},  0,  grey60_col, {default_col,  yellow_col,   default_col,   default_col}},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 1, 0, 0},  0},
+    {1, {0, 0, 0, 1},  {}, grey100_col, {default_col, default_col,   default_col, off_white_col}},
+    {1, {0, 0, 0, 0},  {},  grey60_col},
+    {1, {0, 0, 0, 0},  {}, grey100_col},
+    {1, {0, 1, 0, 0},  {},  grey60_col, {default_col,  yellow_col,   default_col,   default_col}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 1, 0, 0}},
     // Y = 4
-    {1, {0, 0, 1, 1},  0,   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
-    {1, {0, 0, 3, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
-    {1, {0, 0, 1, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
-    {1, {0, 1, 1, 0},  0,   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 3, 0, 0},  0},
+    {1, {0, 0, 1, 1},  {},   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
+    {1, {0, 0, 3, 0},  {},   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {0, 0, 1, 0},  {},   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {0, 1, 1, 0},  {},   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 3, 0, 0}},
     // Y = 5
-    {1, {0, 0, 0, 1},  0,   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
-    {1, {0, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
-    {1, {0, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
-    {1, {0, 1, 0, 0},  0,   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 1, 0, 0},  0},
+    {1, {0, 0, 0, 1},  {},   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
+    {1, {0, 0, 0, 0},  {},   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {0, 0, 0, 0},  {},   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {0, 1, 0, 0},  {},   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 1, 0, 0}},
     // Y = 6
-    {1, {0, 0, 0, 1},  0,   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
-    {1, {0, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
-    {1, {0, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
-    {1, {0, 3, 0, 0},  0,   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 2, 0, 0},  0},
+    {1, {0, 0, 0, 1},  {},   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
+    {1, {0, 0, 0, 0},  {},   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {0, 0, 0, 0},  {},   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {0, 3, 0, 0},  {},   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 2, 0, 0}},
     // Y = 7
-    {1, {0, 0, 0, 2},  0,   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
-    {1, {0, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
-    {1, {0, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
-    {1, {0, 1, 0, 0},  0,   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 0, 0, 0},  0},
-    {1, {0, 1, 0, 0},  0},
+    {1, {0, 0, 0, 2},  {},   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
+    {1, {0, 0, 0, 0},  {},   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {0, 0, 0, 0},  {},   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {0, 1, 0, 0},  {},   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 0, 0, 0}},
+    {1, {0, 1, 0, 0}},
     // Y = 8
-    {1, {1, 0, 0, 1},  0,   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
-    {1, {1, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
-    {1, {2, 0, 0, 0},  0,   green_col, {default_col, default_col,      cyan_col,   default_col}},
-    {1, {1, 1, 0, 0},  0,   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
-    {1, {1, 0, 0, 0},  0},
-    {1, {1, 0, 0, 0},  0},
-    {1, {1, 0, 0, 0},  0},
-    {1, {2, 0, 0, 0},  0},
-    {1, {1, 0, 0, 0},  0},
-    {1, {1, 1, 0, 0},  0},
+    {1, {1, 0, 0, 1},  {},   green_col, {default_col, default_col,      cyan_col,      cyan_col}},
+    {1, {1, 0, 0, 0},  {},   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {2, 0, 0, 0},  {},   green_col, {default_col, default_col,      cyan_col,   default_col}},
+    {1, {1, 1, 0, 0},  {},   green_col, {default_col,  yellow_col,      cyan_col,   default_col}},
+    {1, {1, 0, 0, 0}},
+    {1, {1, 0, 0, 0}},
+    {1, {1, 0, 0, 0}},
+    {1, {2, 0, 0, 0}},
+    {1, {1, 0, 0, 0}},
+    {1, {1, 1, 0, 0}},
 } {
     tiles = blit::Surface::load(asset_iso_tile);
 
@@ -203,9 +203,11 @@ void World::render() {
                     tiles->palette[i] = orig_cols[i];
             }
 
-            if(tile.entity) {
-                auto &ent = entities[tile.entity - 1];
-                draw_sprite(center_pos - Point(tile_width / 2, tile_height / 2) + ent.get_offset_in_tile(), sprites[ent.get_sprite_index()]);
+            for(auto ent_id : tile.entities) {
+                if(ent_id) {
+                    auto &ent = entities[ent_id - 1];
+                    draw_sprite(center_pos - Point(tile_width / 2, tile_height / 2) + ent.get_offset_in_tile(), sprites[ent.get_sprite_index()]);
+                }
             }
 
             draw_wall(center_pos, tile, Side_Bottom);
@@ -231,21 +233,30 @@ void World::update(uint32_t time) {
 bool World::add_entity(blit::Point tile_pos, unsigned int entity) {
     auto &tile = map[tile_pos.x + tile_pos.y * map_width];
 
-    if(tile.entity)
-        return tile.entity == entity + 1; // fail if something else is already there
+    for(auto &ent_id : tile.entities) {
+        if(!ent_id) {
+            ent_id = entity + 1;
+            return true;
+        } else if(ent_id == entity + 1)
+            return true; // already here
+    }
 
-    tile.entity = entity + 1;
-    return true;
+    // we're full
+    return false;
 }
 
 bool World::remove_entity(blit::Point tile_pos, unsigned int entity) {
     auto &tile = map[tile_pos.x + tile_pos.y * map_width];
 
-    if(tile.entity != entity + 1)
-        return false;
+    for(auto &ent_id : tile.entities) {
+         if(ent_id == entity + 1) {
+            ent_id = 0;
+            return true;
+         }
+    }
 
-    tile.entity = 0;
-    return true;
+    // wasn't here
+    return false;
 }
 
 bool World::get_walls_hidden() const {

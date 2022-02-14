@@ -11,7 +11,7 @@
 struct MapTile {
     uint8_t floor;
     uint8_t walls[4]; // bottom, right, top, left
-    uint8_t entity = 0;
+    uint8_t entities[2] = {};
 
     blit::Pen floor_colour = {};
     blit::Pen wall_colour[4] = {};
