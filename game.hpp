@@ -26,7 +26,7 @@ void Game::change_state(Args ...args) {
     if(next_state)
         delete next_state;
 
-    next_state = new T(this, args...);
+    next_state = new T(this, std::forward<Args>(args)...);
 
     if(!state) // start immediately if no current state
         std::swap(state, next_state);
