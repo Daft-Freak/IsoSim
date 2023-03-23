@@ -17,4 +17,6 @@ private:
     Game *game;
 
     World world;
+
+    blit::Point tile_cursor;
 };

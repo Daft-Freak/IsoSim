@@ -3,6 +3,7 @@
 
 #include "level.hpp"
 
+#include "edit-mode.hpp"
 #include "game.hpp"
 #include "world.hpp"
 
@@ -16,6 +17,11 @@ void Level::update(uint32_t time) {
 
     if(blit::buttons.released & blit::Button::Y)
         world.set_walls_hidden(!world.get_walls_hidden());
+
+    if(blit::buttons.released & blit::Button::MENU) {
+        game->change_state<EditMode>(std::move(world));
+        return;
+    }
 
     world.update(time);
 }

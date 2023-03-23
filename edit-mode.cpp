@@ -21,6 +21,26 @@ void EditMode::update(uint32_t time) {
         return;
     }
 
+    if(blit::buttons.released & blit::Button::DPAD_LEFT)
+        tile_cursor.x--;
+    else if(blit::buttons.released & blit::Button::DPAD_RIGHT)
+        tile_cursor.x++;
+
+    if(blit::buttons.released & blit::Button::DPAD_UP)
+        tile_cursor.y--;
+    else if(blit::buttons.released & blit::Button::DPAD_DOWN)
+        tile_cursor.y++;
+
+    if(blit::buttons.released & blit::Button::A) {
+        auto tile = world.get_tile(tile_cursor.x, tile_cursor.y);
+        if(tile) {
+            tile->floor_colour.r = blit::random() & 0xFF;
+            tile->floor_colour.g = blit::random() & 0xFF;
+            tile->floor_colour.b = blit::random() & 0xFF;
+            tile->floor_colour.a = 0xFF;
+        }
+    }
+
     world.update(time);
 }
 
@@ -31,4 +51,13 @@ void EditMode::render() {
     screen.clear();
 
     world.render();
+
+    // tile cursor
+    auto pos = world.get_scroll_offset() + world.to_screen_pos(tile_cursor.x, tile_cursor.y);
+
+    screen.pen = {255, 0, 0};
+    screen.line(pos + blit::Point{-16,  0}, pos + blit::Point{  0, -8});
+    screen.line(pos + blit::Point{  0, -8}, pos + blit::Point{ 16,  0});
+    screen.line(pos + blit::Point{ 16,  0}, pos + blit::Point{  0,  8});
+    screen.line(pos + blit::Point{  0,  8}, pos + blit::Point{-16,  0});
 }
