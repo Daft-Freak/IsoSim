@@ -5,10 +5,10 @@
 
 class Game;
 
-class Level final : public GameState {
+class EditMode final : public GameState {
 public:
-    Level(Game *game, World &&world = {});
-    ~Level() override;
+    EditMode(Game *game, World &&world);
+    ~EditMode() override;
 
     void update(uint32_t time) override;
     void render() override;

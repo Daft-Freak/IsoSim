@@ -6,7 +6,7 @@
 #include "game.hpp"
 #include "world.hpp"
 
-Level::Level(Game *game) : game(game) {
+Level::Level(Game *game, World &&world) : game(game), world(std::move(world)) {
 }
 
 Level::~Level() {

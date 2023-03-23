@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.9)
 project(isosim)
 
 set(PROJECT_SOURCE
+  edit-mode.cpp
   entity.cpp
   game.cpp
   level.cpp
