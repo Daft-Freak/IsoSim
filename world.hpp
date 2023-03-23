@@ -32,6 +32,8 @@ public:
     bool get_walls_hidden() const;
     void set_walls_hidden(bool hidden);
 
+    MapTile *get_tile(int x, int y);
+
     blit::Point to_screen_pos(int x, int y, int z = 0) const;
     blit::Point from_screen_pos(blit::Point screen) const;
 

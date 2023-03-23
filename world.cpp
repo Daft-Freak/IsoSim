@@ -267,6 +267,13 @@ void World::set_walls_hidden(bool hidden) {
     walls_hidden = hidden;
 }
 
+MapTile *World::get_tile(int x, int y) {
+    if(x < 0 || y < 0 || x >= map_width || y >= map_height)
+        return nullptr;
+
+    return &map[x + y * map_width];
+}
+
 blit::Point World::to_screen_pos(int x, int y, int z) const {
     return {x * tile_width / 2 - y * tile_width / 2, y * tile_height / 2 + x * tile_height / 2 - z};
 }
