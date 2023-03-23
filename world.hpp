@@ -20,6 +20,9 @@ struct MapTile {
 class World final {
 public:
     World();
+    World(World &&other);
+
+    World &operator=(World &&other);
 
     void render();
 
