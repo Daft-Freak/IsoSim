@@ -134,7 +134,7 @@ void World::render() {
     using blit::screen;
     using blit::Point;
 
-    Point offset(screen.bounds.w / 2, 40);
+    Point offset = get_scroll_offset();
 
     screen.sprites = tiles;
 
@@ -276,4 +276,8 @@ blit::Point World::from_screen_pos(blit::Point screen) const {
         (screen.x / 2 + screen.y + tile_height / 2) / tile_height,
         (-screen.x / 2 + screen.y + tile_height / 2) / tile_height
     };
+}
+
+blit::Point World::get_scroll_offset() const {
+    return {blit::screen.bounds.w / 2, 40};
 }

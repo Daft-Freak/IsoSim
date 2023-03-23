@@ -35,6 +35,8 @@ public:
     blit::Point to_screen_pos(int x, int y, int z = 0) const;
     blit::Point from_screen_pos(blit::Point screen) const;
 
+    blit::Point get_scroll_offset() const;
+
 private:
     static const int tile_width = 32, tile_height = 16;
 
