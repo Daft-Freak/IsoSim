@@ -117,23 +117,31 @@ void EditMode::update(uint32_t time) {
     if(blit::buttons.released & blit::Button::Y)
         world.set_walls_hidden(!world.get_walls_hidden());
 
+    // rotate
+    if(blit::buttons.released & blit::Button::X) {
+        if(cur_object >= wall_id_start)
+            object_rotation = (object_rotation + 1) % 4;
+    }
+
+    // place object
     if(blit::buttons.released & blit::Button::A) {
         auto tile = world.get_tile(tile_cursor.x, tile_cursor.y);
         if(tile) {
             if(cur_object < wall_id_start)
                 tile->floor = cur_object + 1;
             else if(cur_object < wall_id_end)
-                tile->walls[0] = cur_object / 4; // TODO: rotation
+                tile->walls[object_rotation] = cur_object / 4;
         }
     }
 
+    // remove object
     if(blit::buttons.released & blit::Button::B) {
         auto tile = world.get_tile(tile_cursor.x, tile_cursor.y);
         if(tile) {
             if(cur_object < wall_id_start)
                 tile->floor = 0;
             else if(cur_object < wall_id_end)
-                tile->walls[0] = 0;
+                tile->walls[object_rotation] = 0;
         }
     }
 
@@ -161,7 +169,7 @@ void EditMode::render() {
     auto pos = world.get_scroll_offset() + world.to_screen_pos(tile_cursor.x, tile_cursor.y);
 
     // object sprite
-    auto sprite = sprites[cur_object];
+    auto sprite = sprites[cur_object + object_rotation];
     screen.alpha = 100;
     screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {pos.x - sprite.center_x, pos.y - sprite.center_y});
     screen.alpha = 0xFF;
@@ -189,4 +197,8 @@ void EditMode::on_menu_activated(const Menu::Item &item) {
 void EditMode::on_object_menu_activated(const Menu::Item &item) {
     show_object_menu = false;
     cur_object = item.id;
+
+    // floor can't be rotated
+    if(item.id < wall_id_start)
+        object_rotation = 0;
 }

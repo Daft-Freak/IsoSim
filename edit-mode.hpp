@@ -51,4 +51,5 @@ private:
 
     blit::Point tile_cursor;
     int cur_object = 0;
+    int object_rotation = 0;
 };
