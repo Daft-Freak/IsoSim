@@ -8,7 +8,12 @@
 #include "level.hpp"
 #include "world.hpp"
 
-EditMode::EditMode(Game *game, World &&world) : game(game), world(std::move(world)) {
+EditMode::EditMode(Game *game, World &&world) : game(game), world(std::move(world)), menu("Edit Mode", {{Menu_Exit, "Exit"}}) {
+
+    int menu_w = blit::screen.bounds.w / 3;
+    int menu_x = blit::screen.bounds.w - menu_w;
+    menu.set_display_rect({menu_x, 0, menu_w, blit::screen.bounds.h});
+    menu.set_on_item_activated(std::bind(&EditMode::on_menu_activated, this, std::placeholders::_1));
 }
 
 EditMode::~EditMode() {
@@ -16,8 +21,11 @@ EditMode::~EditMode() {
 
 void EditMode::update(uint32_t time) {
 
-    if(blit::buttons.released & blit::Button::MENU) {
-        game->change_state<Level>(std::move(world));
+    if(blit::buttons.released & blit::Button::MENU)
+        show_menu = !show_menu;
+
+    if(show_menu) {
+        menu.update(time);
         return;
     }
 
@@ -59,6 +67,11 @@ void EditMode::render() {
 
     world.render();
 
+    if(show_menu) {
+        menu.render();
+        return;
+    }
+
     // tile cursor
     auto pos = world.get_scroll_offset() + world.to_screen_pos(tile_cursor.x, tile_cursor.y);
 
@@ -67,4 +80,12 @@ void EditMode::render() {
     screen.line(pos + blit::Point{  0, -8}, pos + blit::Point{ 16,  0});
     screen.line(pos + blit::Point{ 16,  0}, pos + blit::Point{  0,  8});
     screen.line(pos + blit::Point{  0,  8}, pos + blit::Point{-16,  0});
+}
+
+void EditMode::on_menu_activated(const Menu::Item &item) {
+    switch(item.id) {
+        case Menu_Exit:
+            game->change_state<Level>(std::move(world));
+            break;
+    }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game-state.hpp"
+#include "menu.hpp"
 #include "world.hpp"
 
 class Game;
@@ -14,9 +15,18 @@ public:
     void render() override;
 
 private:
+    enum MenuItem {
+        Menu_Exit = 0,
+    };
+
+    void on_menu_activated(const Menu::Item &item);
+
     Game *game;
 
     World world;
+
+    Menu menu;
+    bool show_menu = false;
 
     blit::Point tile_cursor;
 };
