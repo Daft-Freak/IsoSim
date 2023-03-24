@@ -54,20 +54,35 @@ void EditMode::ObjectMenu::render_item(const Item &item, int y, int index) const
 
     auto clip = screen.clip;
 
+    int sprite_index = item.id;
+
     // selected item
-    if(index != current_item) {
+    if(index == current_item) {
+        sprite_index += rotation;
+    } else {
         screen.clip = screen.clip.intersection(item_rect);
         screen.alpha = 100;
     }
 
     // display sprite
-    auto &sprite = sprites[item.id];
+    auto &sprite = sprites[sprite_index];
     auto pos = item_rect.center();
     screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {pos.x - (sprite.sheet_w * 8 / 2), pos.y - (sprite.sheet_h * 8 / 2)});
 
     // restore clip/alpha
     screen.clip = clip;
     screen.alpha = 0xFF;
+}
+
+void EditMode::ObjectMenu::update_menu(uint32_t time) {
+    // for spinning the current item
+    if(items[current_item].id < wall_id_start)
+        rotation = 0;
+    else if(--rotation_timer == 0)
+    {
+        rotation = (rotation + 1) % 4;
+        rotation_timer = 100;
+    }
 }
 
 void EditMode::ObjectMenu::item_activated(const Item &item) {

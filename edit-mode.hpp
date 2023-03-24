@@ -30,9 +30,13 @@ private:
     private:
         void render_item(const Item &item, int y, int index) const override;
 
+        void update_menu(uint32_t time) override;
+
         void item_activated(const Item &item) override;
 
         std::function<void(const Item &)> on_item_pressed = nullptr;
+        int rotation_timer = 100;
+        int rotation = 0;
     };
 
     void on_menu_activated(const Menu::Item &item);
