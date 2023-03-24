@@ -89,6 +89,11 @@ const SpriteInfo sprites[] {
     { 0, 0, 2, 2, 8, 16},
 };
 
+const int wall_id_start = 4;
+const int wall_id_end = 16;
+const int object_id_start = 24;
+const int object_id_end = 56;
+
 const uint8_t wall_to_hidden[]{
     0, // floor
     4, // wall

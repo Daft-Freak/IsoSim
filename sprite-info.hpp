@@ -17,4 +17,7 @@ enum WallSide {
 // isometric sprites from "iso-tile"
 extern const SpriteInfo sprites[];
 
+extern const int wall_id_start, wall_id_end;
+extern const int object_id_start, object_id_end;
+
 extern const uint8_t wall_to_hidden[];
