@@ -34,10 +34,14 @@ void EditMode::update(uint32_t time) {
     if(blit::buttons.released & blit::Button::A) {
         auto tile = world.get_tile(tile_cursor.x, tile_cursor.y);
         if(tile) {
-            tile->floor_colour.r = blit::random() & 0xFF;
-            tile->floor_colour.g = blit::random() & 0xFF;
-            tile->floor_colour.b = blit::random() & 0xFF;
-            tile->floor_colour.a = 0xFF;
+            tile->floor = 1;
+        }
+    }
+
+    if(blit::buttons.released & blit::Button::B) {
+        auto tile = world.get_tile(tile_cursor.x, tile_cursor.y);
+        if(tile) {
+            tile->floor = 0;
         }
     }
 
