@@ -7,6 +7,7 @@ set(PROJECT_SOURCE
   entity.cpp
   game.cpp
   level.cpp
+  menu.cpp
   sprite-info.cpp
   world.cpp
 )
