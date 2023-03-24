@@ -50,4 +50,5 @@ private:
     bool show_object_menu = false;
 
     blit::Point tile_cursor;
+    int cur_object = 0;
 };

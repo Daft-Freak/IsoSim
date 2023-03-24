@@ -120,14 +120,20 @@ void EditMode::update(uint32_t time) {
     if(blit::buttons.released & blit::Button::A) {
         auto tile = world.get_tile(tile_cursor.x, tile_cursor.y);
         if(tile) {
-            tile->floor = 1;
+            if(cur_object < wall_id_start)
+                tile->floor = cur_object + 1;
+            else if(cur_object < wall_id_end)
+                tile->walls[0] = cur_object / 4; // TODO: rotation
         }
     }
 
     if(blit::buttons.released & blit::Button::B) {
         auto tile = world.get_tile(tile_cursor.x, tile_cursor.y);
         if(tile) {
-            tile->floor = 0;
+            if(cur_object < wall_id_start)
+                tile->floor = 0;
+            else if(cur_object < wall_id_end)
+                tile->walls[0] = 0;
         }
     }
 
@@ -176,4 +182,5 @@ void EditMode::on_menu_activated(const Menu::Item &item) {
 
 void EditMode::on_object_menu_activated(const Menu::Item &item) {
     show_object_menu = false;
+    cur_object = item.id;
 }
