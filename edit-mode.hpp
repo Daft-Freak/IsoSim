@@ -16,10 +16,28 @@ public:
 
 private:
     enum MenuItem {
-        Menu_Exit = 0,
+        Menu_SelectObject = 0,
+        Menu_Exit,
+    };
+
+    class ObjectMenu final : public blit::Menu {
+    public:
+        ObjectMenu();
+        ~ObjectMenu();
+
+        void set_on_item_activated(std::function<void(const Item &)> func);
+
+    private:
+        void render_item(const Item &item, int y, int index) const override;
+
+        void item_activated(const Item &item) override;
+
+        std::function<void(const Item &)> on_item_pressed = nullptr;
     };
 
     void on_menu_activated(const Menu::Item &item);
+
+    void on_object_menu_activated(const Menu::Item &item);
 
     Game *game;
 
@@ -27,6 +45,9 @@ private:
 
     Menu menu;
     bool show_menu = false;
+
+    ObjectMenu object_menu;
+    bool show_object_menu = false;
 
     blit::Point tile_cursor;
 };

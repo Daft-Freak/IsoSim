@@ -6,14 +6,84 @@
 
 #include "game.hpp"
 #include "level.hpp"
+#include "sprite-info.hpp"
 #include "world.hpp"
 
-EditMode::EditMode(Game *game, World &&world) : game(game), world(std::move(world)), menu("Edit Mode", {{Menu_Exit, "Exit"}}) {
+EditMode::ObjectMenu::ObjectMenu() : blit::Menu("Objects") {
+    item_h = 40;
+    header_h = footer_h = 0;
+    margin_y = 0;
+
+    background_colour = blit::Pen(0x11, 0x11, 0x11);
+    foreground_colour = blit::Pen(0xF7, 0xF7, 0xF7);
+    selected_item_background = blit::Pen(0x22, 0x22, 0x22);
+
+    num_items = wall_id_end / 4 + (object_id_end - object_id_start) / 4;
+    auto new_items = new Item[num_items];
+
+    // floor/wall
+    int i = 0;
+    for(int sprite_id = 0; sprite_id < wall_id_end; i++, sprite_id += 4) {
+        new_items[i].label = "";
+        new_items[i].id = sprite_id;
+    }
+
+    // objects
+    for(int sprite_id = object_id_start; sprite_id < object_id_end; i++, sprite_id += 4) {
+        new_items[i].label = "";
+        new_items[i].id = sprite_id;
+    }
+
+    items = new_items;
+}
+
+EditMode::ObjectMenu::~ObjectMenu() {
+    delete[] items;
+}
+
+void EditMode::ObjectMenu::set_on_item_activated(std::function<void(const Item &)> func) {
+    on_item_pressed = func;
+}
+
+void EditMode::ObjectMenu::render_item(const Item &item, int y, int index) const {
+    using blit::screen;
+
+    blit::Menu::render_item(item, y, index);
+
+    blit::Rect item_rect(display_rect.x, y, display_rect.w, item_h);
+
+    auto clip = screen.clip;
+
+    // selected item
+    if(index != current_item) {
+        screen.clip = screen.clip.intersection(item_rect);
+        screen.alpha = 100;
+    }
+
+    // display sprite
+    auto &sprite = sprites[item.id];
+    auto pos = item_rect.center();
+    screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {pos.x - (sprite.sheet_w * 8 / 2), pos.y - (sprite.sheet_h * 8 / 2)});
+
+    // restore clip/alpha
+    screen.clip = clip;
+    screen.alpha = 0xFF;
+}
+
+void EditMode::ObjectMenu::item_activated(const Item &item) {
+    if(on_item_pressed)
+        on_item_pressed(item);
+}
+
+EditMode::EditMode(Game *game, World &&world) : game(game), world(std::move(world)), menu("Edit Mode", {{Menu_SelectObject, "Select Object"}, {Menu_Exit, "Exit"}}) {
 
     int menu_w = blit::screen.bounds.w / 3;
     int menu_x = blit::screen.bounds.w - menu_w;
     menu.set_display_rect({menu_x, 0, menu_w, blit::screen.bounds.h});
     menu.set_on_item_activated(std::bind(&EditMode::on_menu_activated, this, std::placeholders::_1));
+
+    object_menu.set_display_rect({menu_x, 0, menu_w, blit::screen.bounds.h});
+    object_menu.set_on_item_activated(std::bind(&EditMode::on_object_menu_activated, this, std::placeholders::_1));
 }
 
 EditMode::~EditMode() {
@@ -23,6 +93,11 @@ void EditMode::update(uint32_t time) {
 
     if(blit::buttons.released & blit::Button::MENU)
         show_menu = !show_menu;
+
+    if(show_object_menu) {
+        object_menu.update(time);
+        return;
+    }
 
     if(show_menu) {
         menu.update(time);
@@ -67,6 +142,11 @@ void EditMode::render() {
 
     world.render();
 
+    if(show_object_menu) {
+        object_menu.render();
+        return;
+    }
+
     if(show_menu) {
         menu.render();
         return;
@@ -84,8 +164,16 @@ void EditMode::render() {
 
 void EditMode::on_menu_activated(const Menu::Item &item) {
     switch(item.id) {
+        case Menu_SelectObject:
+            show_object_menu = true;
+            break;
+
         case Menu_Exit:
             game->change_state<Level>(std::move(world));
             break;
     }
+}
+
+void EditMode::on_object_menu_activated(const Menu::Item &item) {
+    show_object_menu = false;
 }
