@@ -31,6 +31,9 @@ void EditMode::update(uint32_t time) {
     else if(blit::buttons.released & blit::Button::DPAD_DOWN)
         tile_cursor.y++;
 
+    if(blit::buttons.released & blit::Button::Y)
+        world.set_walls_hidden(!world.get_walls_hidden());
+
     if(blit::buttons.released & blit::Button::A) {
         auto tile = world.get_tile(tile_cursor.x, tile_cursor.y);
         if(tile) {
