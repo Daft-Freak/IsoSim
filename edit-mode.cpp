@@ -158,9 +158,15 @@ void EditMode::render() {
         return;
     }
 
-    // tile cursor
     auto pos = world.get_scroll_offset() + world.to_screen_pos(tile_cursor.x, tile_cursor.y);
 
+    // object sprite
+    auto sprite = sprites[cur_object];
+    screen.alpha = 100;
+    screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {pos.x - sprite.center_x, pos.y - sprite.center_y});
+    screen.alpha = 0xFF;
+
+    // tile cursor
     screen.pen = {255, 0, 0};
     screen.line(pos + blit::Point{-16,  0}, pos + blit::Point{  0, -8});
     screen.line(pos + blit::Point{  0, -8}, pos + blit::Point{ 16,  0});
