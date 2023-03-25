@@ -250,6 +250,36 @@ void World::update(uint32_t time) {
     entities[8].set_position({72 + int(std::sin(time / 600.0f) * 52), 72 + int(std::cos(time / 600.0f) * 32)});
 }
 
+unsigned int World::create_entity(blit::Point tile_pos, const EntityInfo &info, int rotation) {
+    unsigned int new_id = 0;
+
+    for(auto &ent : entities) {
+        // "removed" entity, reuse
+        if(ent.get_position() == blit::Point{-16, -16} && &ent.get_info() == &info) {
+            ent.set_tile_position(tile_pos);
+            ent.set_rotation(rotation);
+            return new_id;
+        }
+
+        new_id++;
+    }
+
+    entities.emplace_back(*this, new_id, tile_pos, info, rotation);
+
+    return new_id;
+}
+
+void World::destroy_entity(unsigned int entity) {
+    if(entity >= entities.size())
+        return;
+
+    if(entity == entities.size() - 1) {
+        remove_entity(entities.back().get_tile_position(), entity);
+        entities.pop_back();
+    } else 
+        entities[entity].set_position({-16, -16}); // "remove"
+}
+
 bool World::add_entity(blit::Point tile_pos, unsigned int entity) {
     if(!blit::Rect(0, 0, map_width, map_height).contains(tile_pos))
         return false;
@@ -283,6 +313,20 @@ bool World::remove_entity(blit::Point tile_pos, unsigned int entity) {
 
     // wasn't here
     return false;
+}
+
+unsigned int World::find_entity(blit::Point tile_pos, const EntityInfo &info) {
+    if(!blit::Rect(0, 0, map_width, map_height).contains(tile_pos))
+        return ~0;
+
+    auto &tile = map[tile_pos.x + tile_pos.y * map_width];
+
+    for(auto ent_id : tile.entities) {
+        if(ent_id && &entities[ent_id - 1].get_info() == &info)
+            return ent_id - 1;
+    }
+
+    return ~0;
 }
 
 bool World::get_walls_hidden() const {

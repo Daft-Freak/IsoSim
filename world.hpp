@@ -28,9 +28,14 @@ public:
 
     void update(uint32_t time);
 
+    unsigned int create_entity(blit::Point tile_pos, const EntityInfo &info, int rotation = 0);
+    void destroy_entity(unsigned int entity);
+
     // can return false if no room
     bool add_entity(blit::Point tile_pos, unsigned int entity);
     bool remove_entity(blit::Point tile_pos, unsigned int entity);
+
+    unsigned int find_entity(blit::Point tile_pos, const EntityInfo &info);
 
     bool get_walls_hidden() const;
     void set_walls_hidden(bool hidden);
