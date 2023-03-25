@@ -251,6 +251,9 @@ void World::update(uint32_t time) {
 }
 
 bool World::add_entity(blit::Point tile_pos, unsigned int entity) {
+    if(!blit::Rect(0, 0, map_width, map_height).contains(tile_pos))
+        return false;
+
     auto &tile = map[tile_pos.x + tile_pos.y * map_width];
 
     for(auto &ent_id : tile.entities) {
@@ -266,6 +269,9 @@ bool World::add_entity(blit::Point tile_pos, unsigned int entity) {
 }
 
 bool World::remove_entity(blit::Point tile_pos, unsigned int entity) {
+    if(!blit::Rect(0, 0, map_width, map_height).contains(tile_pos))
+        return false;
+
     auto &tile = map[tile_pos.x + tile_pos.y * map_width];
 
     for(auto &ent_id : tile.entities) {
