@@ -43,6 +43,8 @@ private:
 
     void on_object_menu_activated(const Menu::Item &item);
 
+    const EntityInfo &sprite_to_entity(int sprite_index);
+
     Game *game;
 
     World world;

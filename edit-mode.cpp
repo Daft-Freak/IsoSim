@@ -146,6 +146,13 @@ void EditMode::update(uint32_t time) {
                 tile->floor = cur_object + 1;
             else if(cur_object < wall_id_end)
                 tile->walls[object_rotation] = cur_object / 4;
+            else if(cur_object >= object_id_start && cur_object < object_id_end) {
+                auto &ent_info = sprite_to_entity(cur_object);
+                auto ent = world.find_entity(tile_cursor, ent_info);
+
+                if(ent == ~0u) // check if already there
+                    world.create_entity(tile_cursor, ent_info, object_rotation);
+            }
         }
     }
 
@@ -157,6 +164,12 @@ void EditMode::update(uint32_t time) {
                 tile->floor = 0;
             else if(cur_object < wall_id_end)
                 tile->walls[object_rotation] = 0;
+            else if(cur_object >= object_id_start && cur_object < object_id_end) {
+                auto &ent_info = sprite_to_entity(cur_object);
+                auto ent = world.find_entity(tile_cursor, ent_info);
+                if(ent != ~0u)
+                    world.destroy_entity(ent);
+            }
         }
     }
 
@@ -216,4 +229,28 @@ void EditMode::on_object_menu_activated(const Menu::Item &item) {
     // floor can't be rotated
     if(item.id < wall_id_start)
         object_rotation = 0;
+}
+
+const EntityInfo &EditMode::sprite_to_entity(int sprite_index) {
+    // TODO: don't use sprite ids for menu?
+    static const EntityInfo *all_entities[]{
+        &entity_bathroom_shower,
+        &entity_bathroom_sink,
+        &entity_bathroom_toilet,
+
+        &entity_bedroom_bed,
+
+        &entity_kitchen_fridge,
+        &entity_kitchen_oven,
+        &entity_kitchen_sink,
+
+        &entity_livingroom_tv,
+    };
+
+    for(auto ent_info : all_entities) {
+        if(ent_info->base_sprite == sprite_index)
+            return *ent_info;
+    }
+
+    return entity_kitchen_sink;
 }
