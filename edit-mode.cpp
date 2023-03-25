@@ -202,12 +202,34 @@ void EditMode::render() {
     screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {pos.x - sprite.center_x, pos.y - sprite.center_y});
     screen.alpha = 0xFF;
 
+    // get size of object (walls/floor are 1x1)
+    blit::Size size(1, 1);
+
+    if(cur_object >= object_id_start) {
+        auto ent = sprite_to_entity(cur_object);
+        size = {ent.w, ent.h};
+
+        if(object_rotation == 1 || object_rotation == 3) // 90/270 deg rotation
+            std::swap(size.w, size.h);
+    }
+
     // tile cursor
     screen.pen = {255, 0, 0};
-    screen.line(pos + blit::Point{-16,  0}, pos + blit::Point{  0, -8});
-    screen.line(pos + blit::Point{  0, -8}, pos + blit::Point{ 16,  0});
-    screen.line(pos + blit::Point{ 16,  0}, pos + blit::Point{  0,  8});
-    screen.line(pos + blit::Point{  0,  8}, pos + blit::Point{-16,  0});
+
+    for(int y = 0; y < size.h; y++) {
+        for(int x = 0; x < size.w; x++) {
+            // TODO: un-hardcode/de-duplicate
+            const int tile_w = 32;
+            const int tile_h = 16;
+
+            pos = world.get_scroll_offset() + world.to_screen_pos(tile_cursor.x - x, tile_cursor.y - y);
+
+            screen.line(pos + blit::Point{-tile_w / 2,           0}, pos + blit::Point{          0, -tile_h / 2});
+            screen.line(pos + blit::Point{          0, -tile_h / 2}, pos + blit::Point{ tile_w / 2,           0});
+            screen.line(pos + blit::Point{ tile_w / 2,           0}, pos + blit::Point{          0,  tile_h / 2});
+            screen.line(pos + blit::Point{          0,  tile_h / 2}, pos + blit::Point{-tile_w / 2,           0});
+        }
+    }
 }
 
 void EditMode::on_menu_activated(const Menu::Item &item) {
