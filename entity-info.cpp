@@ -10,4 +10,4 @@ const EntityInfo entity_kitchen_fridge{1, 1, 40};
 const EntityInfo entity_kitchen_oven{1, 1, 36};
 const EntityInfo entity_kitchen_sink{1, 1, 32};
 
-const EntityInfo entity_livingroom_tv{1, 1, 28};
+const EntityInfo entity_livingroom_tv{2, 1, 28};
