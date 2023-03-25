@@ -5,6 +5,7 @@ project(isosim)
 set(PROJECT_SOURCE
   edit-mode.cpp
   entity.cpp
+  entity-info.cpp
   game.cpp
   level.cpp
   menu.cpp

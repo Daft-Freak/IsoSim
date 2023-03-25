@@ -7,6 +7,8 @@
 #include "assets.hpp"
 #include "sprite-info.hpp"
 
+const EntityInfo entity_test{1, 1, 56};
+
 // TODO: this is getting silly, need something to edit this with
 static const blit::Pen default_col{}, yellow_col{255, 255, 128}, cyan_col{200, 255, 255}, green_col{50, 100, 50},
                        off_white_col{240, 240, 240}, grey60_col{60, 60, 60}, grey100_col{100, 100, 100};
@@ -115,19 +117,19 @@ World::World() : map{
     tiles = blit::Surface::load(asset_iso_tile);
 
     // test entity data
-    entities.emplace_back(*this, entities.size(), blit::Point{0, 0}, 44); // shower
-    entities.emplace_back(*this, entities.size(), blit::Point{2, 0}, 52); // toilet
-    entities.emplace_back(*this, entities.size(), blit::Point{6, 0}, 36); // oven
-    entities.emplace_back(*this, entities.size(), blit::Point{7, 0}, 32); // kitchen sink
-    entities.emplace_back(*this, entities.size(), blit::Point{8, 0}, 40); // fridge
+    entities.emplace_back(*this, entities.size(), blit::Point{0, 0}, entity_bathroom_shower); // shower
+    entities.emplace_back(*this, entities.size(), blit::Point{2, 0}, entity_bathroom_toilet); // toilet
+    entities.emplace_back(*this, entities.size(), blit::Point{6, 0}, entity_kitchen_oven); // oven
+    entities.emplace_back(*this, entities.size(), blit::Point{7, 0}, entity_kitchen_sink); // kitchen sink
+    entities.emplace_back(*this, entities.size(), blit::Point{8, 0}, entity_kitchen_fridge); // fridge
 
-    entities.emplace_back(*this, entities.size(), blit::Point{2, 3}, 50); // bathroom sink
+    entities.emplace_back(*this, entities.size(), blit::Point{2, 3}, entity_bathroom_sink, 2); // bathroom sink
 
-    entities.emplace_back(*this, entities.size(), blit::Point{1, 6}, 25); // bed
+    entities.emplace_back(*this, entities.size(), blit::Point{1, 6}, entity_bedroom_bed, 1); // bed
 
-    entities.emplace_back(*this, entities.size(), blit::Point{9, 7}, 31); // tv
+    entities.emplace_back(*this, entities.size(), blit::Point{9, 7}, entity_livingroom_tv, 3); // tv
 
-    entities.emplace_back(*this, entities.size(), blit::Point{1, 1}, 56); // test thing
+    entities.emplace_back(*this, entities.size(), blit::Point{1, 1}, entity_test); // test thing
 }
 
 World::World(World &&other) {
@@ -141,7 +143,7 @@ World &World::operator=(World &&other) {
         std::swap(map[i], other.map[i]);
 
     for(auto &ent : other.entities)
-        entities.emplace_back(*this, entities.size(), ent.get_tile_position(), ent.get_sprite_index());
+        entities.emplace_back(*this, entities.size(), ent.get_tile_position(), ent.get_info(), ent.get_rotation());
 
     other.entities.clear();
 

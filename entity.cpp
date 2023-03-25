@@ -1,8 +1,10 @@
 #include "entity.hpp"
 #include "world.hpp"
 
-Entity::Entity(World &world, uint16_t index, blit::Point pos, uint16_t sprite_index) : world(world), index(index), sprite_index(sprite_index) {
+Entity::Entity(World &world, uint16_t index, blit::Point pos, const EntityInfo &info, int rotation) : world(world), index(index), sprite_index(0), info(info) {
     set_tile_position(pos);
+
+    sprite_index = info.base_sprite + rotation;
 };
 
 blit::Point Entity::get_position() const {
@@ -36,4 +38,12 @@ void Entity::set_tile_position(blit::Point p) {
 
 uint16_t Entity::get_sprite_index() const {
     return sprite_index;
+}
+
+int Entity::get_rotation() const {
+    return sprite_index - info.base_sprite;
+}
+
+const EntityInfo &Entity::get_info() const {
+    return info;
 }
