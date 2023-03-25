@@ -5,7 +5,7 @@ Entity::Entity(World &world, uint16_t index, blit::Point pos, const EntityInfo &
     set_tile_position(pos);
 
     sprite_index = info.base_sprite + rotation;
-};
+}
 
 blit::Point Entity::get_position() const {
     return position;
@@ -42,6 +42,10 @@ uint16_t Entity::get_sprite_index() const {
 
 int Entity::get_rotation() const {
     return sprite_index - info.base_sprite;
+}
+
+void Entity::set_rotation(int rotation) {
+    sprite_index = info.base_sprite + rotation;
 }
 
 const EntityInfo &Entity::get_info() const {
