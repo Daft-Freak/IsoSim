@@ -378,6 +378,12 @@ bool World::can_place_entity(blit::Point tile_pos, blit::Size ent_size, int inde
             // check of this slot is empty AND that the previous slot isn't to avoid weird stacking
             if(tile.entities[index] || (index > 0 && !tile.entities[index - 1]))
                 return false;
+
+            // check walls
+            if((x && tile.walls[Side_Right]) || (x < ent_size.w - 1 && tile.walls[Side_Left]))
+                return false;
+            if((y && tile.walls[Side_Bottom]) || (y < ent_size.h - 1 && tile.walls[Side_Top]))
+                return false;
         }
     }
 
