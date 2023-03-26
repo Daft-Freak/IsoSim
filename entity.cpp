@@ -51,3 +51,12 @@ void Entity::set_rotation(int rotation) {
 const EntityInfo &Entity::get_info() const {
     return info;
 }
+
+blit::Size Entity::get_size() const {
+    blit::Size ret(info.w, info.h);
+
+    if(get_rotation() & 1)
+        std::swap(ret.w, ret.h);
+
+    return ret;
+}

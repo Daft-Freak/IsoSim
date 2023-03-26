@@ -26,6 +26,8 @@ public:
 
     const EntityInfo &get_info() const;
 
+    blit::Size get_size() const;
+
 private:
     World &world;
 
