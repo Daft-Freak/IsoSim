@@ -256,8 +256,8 @@ unsigned int World::create_entity(blit::Point tile_pos, const EntityInfo &info, 
     for(auto &ent : entities) {
         // "removed" entity, reuse
         if(ent.get_position() == blit::Point{-16, -16} && &ent.get_info() == &info) {
-            ent.set_tile_position(tile_pos);
             ent.set_rotation(rotation);
+            ent.set_tile_position(tile_pos);
             return new_id;
         }
 
