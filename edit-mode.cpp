@@ -204,6 +204,7 @@ void EditMode::render() {
 
     // get size of object (walls/floor are 1x1)
     blit::Size size(1, 1);
+    bool can_place = true;
 
     if(cur_object >= object_id_start) {
         auto ent = sprite_to_entity(cur_object);
@@ -211,10 +212,15 @@ void EditMode::render() {
 
         if(object_rotation == 1 || object_rotation == 3) // 90/270 deg rotation
             std::swap(size.w, size.h);
+
+        can_place = world.can_place_entity(tile_cursor, size, 0);
     }
 
     // tile cursor
-    screen.pen = {255, 0, 0};
+    if(can_place)
+        screen.pen = {0, 255, 0};
+    else
+        screen.pen = {255, 0, 0};
 
     for(int y = 0; y < size.h; y++) {
         for(int x = 0; x < size.w; x++) {
