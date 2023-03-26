@@ -37,6 +37,8 @@ public:
 
     unsigned int find_entity(blit::Point tile_pos, const EntityInfo &info);
 
+    bool can_place_entity(blit::Point tile_pos, blit::Size ent_size, int index) const;
+
     bool get_walls_hidden() const;
     void set_walls_hidden(bool hidden);
 

@@ -253,6 +253,14 @@ void World::update(uint32_t time) {
 unsigned int World::create_entity(blit::Point tile_pos, const EntityInfo &info, int rotation) {
     unsigned int new_id = 0;
 
+    // check first
+    blit::Size ent_size(info.w, info.h);
+    if(rotation == 1 || rotation == 3)
+        std::swap(ent_size.w, ent_size.h);
+
+    if(!can_place_entity(tile_pos, ent_size, 0))
+        return ~0;
+
     for(auto &ent : entities) {
         // "removed" entity, reuse
         if(ent.get_position() == blit::Point{-16, -16} && &ent.get_info() == &info) {
@@ -296,19 +304,7 @@ bool World::add_entity(blit::Point tile_pos, blit::Size ent_size, unsigned int e
         if(base_tile.entities[i] == entity + 1)
             return true;
 
-        // check all tiles
-        bool space_for_ent = true;
-        for(int y = 0; y < ent_size.h && space_for_ent; y++) {
-            for(int x = 0; x < ent_size.w && space_for_ent; x++) {
-                auto &tile = map[tile_pos.x - x + (tile_pos.y - y) * map_width];
-
-                // check of this slot is empty AND that the previous slot isn't to avoid weird stacking
-                if(tile.entities[i] || (i > 0 && !tile.entities[i - 1]))
-                    space_for_ent = false;
-            }
-        }
-
-        if(space_for_ent) {
+        if(can_place_entity(tile_pos, ent_size, i)) {
             uint8_t id = entity + 1;
 
             for(int y = 0; y < ent_size.h; y++) {
@@ -365,6 +361,21 @@ unsigned int World::find_entity(blit::Point tile_pos, const EntityInfo &info) {
     }
 
     return ~0;
+}
+
+bool World::can_place_entity(blit::Point tile_pos, blit::Size ent_size, int index) const {
+    // check all tiles
+    for(int y = 0; y < ent_size.h; y++) {
+        for(int x = 0; x < ent_size.w; x++) {
+            auto &tile = map[tile_pos.x - x + (tile_pos.y - y) * map_width];
+
+            // check of this slot is empty AND that the previous slot isn't to avoid weird stacking
+            if(tile.entities[index] || (index > 0 && !tile.entities[index - 1]))
+                return false;
+        }
+    }
+
+    return true;
 }
 
 bool World::get_walls_hidden() const {
