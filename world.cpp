@@ -224,7 +224,7 @@ void World::render() {
             }
 
             for(auto ent_id : tile.entities) {
-                if(ent_id) {
+                if(ent_id && ent_id != 0xFF) {
                     auto &ent = entities[ent_id - 1];
                     draw_sprite(center_pos - Point(tile_width / 2, tile_height / 2) + ent.get_offset_in_tile(), sprites[ent.get_sprite_index()]);
                 }
@@ -274,7 +274,7 @@ void World::destroy_entity(unsigned int entity) {
         return;
 
     if(entity == entities.size() - 1) {
-        remove_entity(entities.back().get_tile_position(), entity);
+        remove_entity(entities.back().get_tile_position(), entities.back().get_size(), entity);
         entities.pop_back();
     } else 
         entities[entity].set_position({-16, -16}); // "remove"
@@ -302,15 +302,21 @@ bool World::add_entity(blit::Point tile_pos, blit::Size ent_size, unsigned int e
             for(int x = 0; x < ent_size.w && space_for_ent; x++) {
                 auto &tile = map[tile_pos.x - x + (tile_pos.y - y) * map_width];
 
-                if(tile.entities[i])
+                // check of this slot is empty AND that the previous slot isn't to avoid weird stacking
+                if(tile.entities[i] || (i > 0 && !tile.entities[i - 1]))
                     space_for_ent = false;
             }
         }
 
         if(space_for_ent) {
-            base_tile.entities[i] = entity + 1;
+            uint8_t id = entity + 1;
 
-            // TODO: mark other tiles
+            for(int y = 0; y < ent_size.h; y++) {
+                for(int x = 0; x < ent_size.w; x++) {
+                    map[tile_pos.x - x + (tile_pos.y - y) * map_width].entities[i] = id;
+                    id = 0xFF; // only use the entity id on the first tile
+                }
+            }
 
             return true;
         }
@@ -325,15 +331,20 @@ bool World::add_entity(blit::Point tile_pos, blit::Size ent_size, unsigned int e
     return false;
 }
 
-bool World::remove_entity(blit::Point tile_pos, unsigned int entity) {
+bool World::remove_entity(blit::Point tile_pos, blit::Size ent_size, unsigned int entity) {
     if(!blit::Rect(0, 0, map_width, map_height).contains(tile_pos))
         return false;
 
-    auto &tile = map[tile_pos.x + tile_pos.y * map_width];
+    auto &base_tile = map[tile_pos.x + tile_pos.y * map_width];
 
-    for(auto &ent_id : tile.entities) {
-         if(ent_id == entity + 1) {
-            ent_id = 0;
+    for(size_t i = 0; i < std::size(base_tile.entities); i++) {
+         if(base_tile.entities[i] == entity + 1) {
+            // clear all tiles
+            for(int y = 0; y < ent_size.h; y++) {
+                for(int x = 0; x < ent_size.w; x++) {
+                    map[tile_pos.x - x + (tile_pos.y - y) * map_width].entities[i] = 0;
+                }
+            }
             return true;
          }
     }
@@ -349,7 +360,7 @@ unsigned int World::find_entity(blit::Point tile_pos, const EntityInfo &info) {
     auto &tile = map[tile_pos.x + tile_pos.y * map_width];
 
     for(auto ent_id : tile.entities) {
-        if(ent_id && &entities[ent_id - 1].get_info() == &info)
+        if(ent_id && ent_id != 0xFF && &entities[ent_id - 1].get_info() == &info)
             return ent_id - 1;
     }
 
