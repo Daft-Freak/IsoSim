@@ -280,18 +280,45 @@ void World::destroy_entity(unsigned int entity) {
         entities[entity].set_position({-16, -16}); // "remove"
 }
 
-bool World::add_entity(blit::Point tile_pos, unsigned int entity) {
-    if(!blit::Rect(0, 0, map_width, map_height).contains(tile_pos))
+bool World::add_entity(blit::Point tile_pos, blit::Size ent_size, unsigned int entity) {
+    blit::Rect map_rect(0, 0, map_width, map_height);
+    if(!map_rect.contains(tile_pos))
         return false;
 
-    auto &tile = map[tile_pos.x + tile_pos.y * map_width];
+    // check full entity fits
+    if(!map_rect.contains(tile_pos - blit::Point(ent_size.w - 1, ent_size.h - 1)))
+        return false;
 
-    for(auto &ent_id : tile.entities) {
-        if(!ent_id) {
-            ent_id = entity + 1;
+    auto &base_tile = map[tile_pos.x + tile_pos.y * map_width];
+
+    for(size_t i = 0; i < std::size(base_tile.entities); i++) {
+        // already here
+        if(base_tile.entities[i] == entity + 1)
             return true;
-        } else if(ent_id == entity + 1)
-            return true; // already here
+
+        // check all tiles
+        bool space_for_ent = true;
+        for(int y = 0; y < ent_size.h && space_for_ent; y++) {
+            for(int x = 0; x < ent_size.w && space_for_ent; x++) {
+                auto &tile = map[tile_pos.x - x + (tile_pos.y - y) * map_width];
+
+                if(tile.entities[i])
+                    space_for_ent = false;
+            }
+        }
+
+        if(space_for_ent) {
+            base_tile.entities[i] = entity + 1;
+
+            // TODO: mark other tiles
+
+            return true;
+        }
+
+        // this tile is free, one of the others isn't
+        // stop here to not stack across tiles
+        if(!base_tile.entities[i])
+            return false;
     }
 
     // we're full

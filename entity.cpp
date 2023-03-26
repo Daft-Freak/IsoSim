@@ -2,9 +2,8 @@
 #include "world.hpp"
 
 Entity::Entity(World &world, uint16_t index, blit::Point pos, const EntityInfo &info, int rotation) : world(world), index(index), sprite_index(0), info(info) {
-    set_tile_position(pos);
-
     sprite_index = info.base_sprite + rotation;
+    set_tile_position(pos);
 }
 
 blit::Point Entity::get_position() const {
@@ -14,7 +13,7 @@ blit::Point Entity::get_position() const {
 void Entity::set_position(blit::Point p) {
     auto old_pos = get_tile_position();
     if((p / 16) != old_pos) {
-        world.add_entity(p / 16, index); // TODO: check this and reject move?
+        world.add_entity(p / 16, get_size(), index); // TODO: check this and reject move?
         world.remove_entity(old_pos, index);
     }
 

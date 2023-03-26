@@ -32,7 +32,7 @@ public:
     void destroy_entity(unsigned int entity);
 
     // can return false if no room
-    bool add_entity(blit::Point tile_pos, unsigned int entity);
+    bool add_entity(blit::Point tile_pos, blit::Size ent_size, unsigned int entity);
     bool remove_entity(blit::Point tile_pos, unsigned int entity);
 
     unsigned int find_entity(blit::Point tile_pos, const EntityInfo &info);
