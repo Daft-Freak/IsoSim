@@ -364,9 +364,15 @@ unsigned int World::find_entity(blit::Point tile_pos, const EntityInfo &info) {
 }
 
 bool World::can_place_entity(blit::Point tile_pos, blit::Size ent_size, int index) const {
+    blit::Rect map_rect(0, 0, map_width, map_height);
+
     // check all tiles
     for(int y = 0; y < ent_size.h; y++) {
         for(int x = 0; x < ent_size.w; x++) {
+            // check map bounds
+            if(!map_rect.contains({tile_pos.x - x, tile_pos.y - y}))
+                return false;
+
             auto &tile = map[tile_pos.x - x + (tile_pos.y - y) * map_width];
 
             // check of this slot is empty AND that the previous slot isn't to avoid weird stacking
