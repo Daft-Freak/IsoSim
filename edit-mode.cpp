@@ -172,8 +172,6 @@ void EditMode::update(uint32_t time) {
             }
         }
     }
-
-    world.update(time);
 }
 
 void EditMode::render() {
