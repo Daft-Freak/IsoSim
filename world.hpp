@@ -56,7 +56,7 @@ private:
 
     OwnedSurface tiles;
 
-    static const int map_width = 10, map_height = 9;
+    static const int map_width = 16, map_height = 16;
     MapTile map[map_width * map_height];
 
     std::vector<Entity> entities;
