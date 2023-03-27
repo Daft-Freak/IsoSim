@@ -90,7 +90,7 @@ void EditMode::ObjectMenu::item_activated(const Item &item) {
         on_item_pressed(item);
 }
 
-EditMode::EditMode(Game *game, World &&world) : game(game), world(std::move(world)), menu("Edit Mode", {{Menu_SelectObject, "Select Object"}, {Menu_Exit, "Exit"}}) {
+EditMode::EditMode(Game *game, std::shared_ptr<World> world) : game(game), world(world), menu("Edit Mode", {{Menu_SelectObject, "Select Object"}, {Menu_Exit, "Exit"}}) {
 
     int menu_w = blit::screen.bounds.w / 3;
     int menu_x = blit::screen.bounds.w - menu_w;
@@ -130,7 +130,7 @@ void EditMode::update(uint32_t time) {
         tile_cursor.y++;
 
     if(blit::buttons.released & blit::Button::Y)
-        world.set_walls_hidden(!world.get_walls_hidden());
+        world->set_walls_hidden(!world->get_walls_hidden());
 
     // rotate
     if(blit::buttons.released & blit::Button::X) {
@@ -140,7 +140,7 @@ void EditMode::update(uint32_t time) {
 
     // place object
     if(blit::buttons.released & blit::Button::A) {
-        auto tile = world.get_tile(tile_cursor.x, tile_cursor.y);
+        auto tile = world->get_tile(tile_cursor.x, tile_cursor.y);
         if(tile) {
             if(cur_object < wall_id_start)
                 tile->floor = cur_object + 1;
@@ -148,17 +148,17 @@ void EditMode::update(uint32_t time) {
                 tile->walls[object_rotation] = cur_object / 4;
             else if(cur_object >= object_id_start && cur_object < object_id_end) {
                 auto &ent_info = sprite_to_entity(cur_object);
-                auto ent = world.find_entity(tile_cursor, ent_info);
+                auto ent = world->find_entity(tile_cursor, ent_info);
 
                 if(ent == ~0u) // check if already there
-                    world.create_entity(tile_cursor, ent_info, object_rotation);
+                    world->create_entity(tile_cursor, ent_info, object_rotation);
             }
         }
     }
 
     // remove object
     if(blit::buttons.released & blit::Button::B) {
-        auto tile = world.get_tile(tile_cursor.x, tile_cursor.y);
+        auto tile = world->get_tile(tile_cursor.x, tile_cursor.y);
         if(tile) {
             if(cur_object < wall_id_start)
                 tile->floor = 0;
@@ -166,9 +166,9 @@ void EditMode::update(uint32_t time) {
                 tile->walls[object_rotation] = 0;
             else if(cur_object >= object_id_start && cur_object < object_id_end) {
                 auto &ent_info = sprite_to_entity(cur_object);
-                auto ent = world.find_entity(tile_cursor, ent_info);
+                auto ent = world->find_entity(tile_cursor, ent_info);
                 if(ent != ~0u)
-                    world.destroy_entity(ent);
+                    world->destroy_entity(ent);
             }
         }
     }
@@ -180,7 +180,7 @@ void EditMode::render() {
     screen.pen = {0x63, 0x9b, 0xff}; // "sky" colour
     screen.clear();
 
-    world.render();
+    world->render();
 
     if(show_object_menu) {
         object_menu.render();
@@ -192,7 +192,7 @@ void EditMode::render() {
         return;
     }
 
-    auto pos = world.get_scroll_offset() + world.to_screen_pos(tile_cursor.x, tile_cursor.y);
+    auto pos = world->get_scroll_offset() + world->to_screen_pos(tile_cursor.x, tile_cursor.y);
 
     // object sprite
     auto sprite = sprites[cur_object + object_rotation];
@@ -211,7 +211,7 @@ void EditMode::render() {
         if(object_rotation == 1 || object_rotation == 3) // 90/270 deg rotation
             std::swap(size.w, size.h);
 
-        can_place = world.can_place_entity(tile_cursor, size, 0);
+        can_place = world->can_place_entity(tile_cursor, size, 0);
     }
 
     // tile cursor
@@ -226,7 +226,7 @@ void EditMode::render() {
             const int tile_w = 32;
             const int tile_h = 16;
 
-            pos = world.get_scroll_offset() + world.to_screen_pos(tile_cursor.x - x, tile_cursor.y - y);
+            pos = world->get_scroll_offset() + world->to_screen_pos(tile_cursor.x - x, tile_cursor.y - y);
 
             screen.line(pos + blit::Point{-tile_w / 2,           0}, pos + blit::Point{          0, -tile_h / 2});
             screen.line(pos + blit::Point{          0, -tile_h / 2}, pos + blit::Point{ tile_w / 2,           0});

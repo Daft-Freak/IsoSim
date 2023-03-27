@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "game-state.hpp"
 #include "menu.hpp"
 #include "world.hpp"
@@ -8,7 +10,7 @@ class Game;
 
 class EditMode final : public GameState {
 public:
-    EditMode(Game *game, World &&world);
+    EditMode(Game *game, std::shared_ptr<World> world);
     ~EditMode() override;
 
     void update(uint32_t time) override;
@@ -47,7 +49,7 @@ private:
 
     Game *game;
 
-    World world;
+    std::shared_ptr<World> world;
 
     Menu menu;
     bool show_menu = false;
