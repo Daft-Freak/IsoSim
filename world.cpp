@@ -438,6 +438,10 @@ Entity &World::get_entity(unsigned int entity) {
     return entities[entity];
 }
 
+PathFinder &World::get_path_finder() {
+    return path_finder;
+}
+
 bool World::get_walls_hidden() const {
     return walls_hidden;
 }
