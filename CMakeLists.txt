@@ -9,6 +9,7 @@ set(PROJECT_SOURCE
   game.cpp
   level.cpp
   menu.cpp
+  path-finder.cpp
   sprite-info.cpp
   world.cpp
 )
