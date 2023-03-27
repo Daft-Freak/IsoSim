@@ -467,6 +467,10 @@ MapTile *World::get_tile(int x, int y) {
     return &map[x + y * map_width];
 }
 
+blit::Size World::get_bounds() const {
+    return {map_width, map_height};
+}
+
 blit::Point World::to_screen_pos(int x, int y, int z) const {
     return {x * tile_width / 2 - y * tile_width / 2, y * tile_height / 2 + x * tile_height / 2 - z};
 }

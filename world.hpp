@@ -44,6 +44,8 @@ public:
 
     MapTile *get_tile(int x, int y);
 
+    blit::Size get_bounds() const;
+
     blit::Point to_screen_pos(int x, int y, int z = 0) const;
     blit::Point from_screen_pos(blit::Point screen) const;
 
