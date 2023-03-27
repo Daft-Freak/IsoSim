@@ -271,20 +271,20 @@ void PathFinder::update() {
     }
 }
 
-int PathFinder::get_tile_collision(State &state, unsigned int x, unsigned int y) const {
+int PathFinder::get_tile_collision(State &state, unsigned int x, unsigned int y, bool check_ents) const {
     // handle all tiles this enity will cover as one large tile
     int ret = 0;
 
     for(int y_off = 0; y_off < state.entity_size.h; y_off++) {
         for(int x_off = 0; x_off < state.entity_size.w; x_off++) {
-            ret |= get_single_tile_collision(state, x + x_off, y + y_off);
+            ret |= get_single_tile_collision(state, x + x_off, y + y_off, check_ents);
         }
     }
 
     return ret;
 }
 
-int PathFinder::get_single_tile_collision(State &state, unsigned int x, unsigned int y) const {
+int PathFinder::get_single_tile_collision(State &state, unsigned int x, unsigned int y, bool check_ents) const {
     auto bounds = world.get_bounds();
 
     // handle large units at the map edge
@@ -306,6 +306,9 @@ int PathFinder::get_single_tile_collision(State &state, unsigned int x, unsigned
     if(tile->walls[Side_Left])
         ret |= CD_Left;
 
+    if(!check_ents)
+        return ret;
+
     // ignore tiles the entity we're moving is on
     if(pos.x >= state.start_pos.x && pos.x < state.start_pos.x + state.entity_size.w && pos.y >= state.start_pos.y && pos.y < state.start_pos.y + state.entity_size.h)
         return ret;
@@ -324,20 +327,20 @@ int PathFinder::get_single_tile_collision(State &state, unsigned int x, unsigned
     return ret;
 }
 
-bool PathFinder::can_move_to(int collision, int xDiff, int yDiff) const {
-    if(collision == 0)
+bool PathFinder::can_move_to(int src_collision, int dst_collision, int xDiff, int yDiff) const {
+    if(src_collision == 0 && dst_collision == 0)
         return true;
 
-    if(yDiff > 0 && !(collision & CD_Up))
+    if(yDiff > 0 && !(dst_collision & CD_Up) && !(src_collision & CD_Down))
         return true;
 
-    if(yDiff < 0 && !(collision & CD_Down))
+    if(yDiff < 0 && !(dst_collision & CD_Down) && !(src_collision & CD_Up))
         return true;
 
-    if(xDiff > 0 && !(collision & CD_Left))
+    if(xDiff > 0 && !(dst_collision & CD_Left) && !(src_collision & CD_Right))
         return true;
 
-    if(xDiff < 0 && !(collision & CD_Right))
+    if(xDiff < 0 && !(dst_collision & CD_Right) && !(src_collision & CD_Left))
         return true;
 
     return false;
@@ -371,9 +374,12 @@ std::vector<int> PathFinder::get_neighbours(State &state, int tile) const {
                 continue; //cutting corner
         }
 
-        bool canMove = can_move_to(get_tile_collision(state, newX, newY), newX - x, newY - y);
+        auto src_collision = get_tile_collision(state, x, y, false);
+        auto dst_collision = get_tile_collision(state, newX, newY);
 
-        if(canMove)
+        bool can_move = can_move_to(src_collision, dst_collision, newX - x, newY - y);
+
+        if(can_move)
             neighbours.push_back(newX + newY * width);
     }
 

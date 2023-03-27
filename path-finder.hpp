@@ -59,9 +59,9 @@ protected:
 
     World &world;
 
-    int get_tile_collision(State &state, unsigned int x, unsigned int y) const;
-    int get_single_tile_collision(State &state, unsigned int x, unsigned int y) const;
-    bool can_move_to(int collision, int xDiff, int yDiff) const;
+    int get_tile_collision(State &state, unsigned int x, unsigned int y, bool check_ents = true) const;
+    int get_single_tile_collision(State &state, unsigned int x, unsigned int y, bool check_ents) const;
+    bool can_move_to(int src_collision, int dst_collision, int xDiff, int yDiff) const;
     std::vector<int> get_neighbours(State &state, int tile) const;
 
     std::map<unsigned int, State> paths;
