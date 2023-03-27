@@ -10,6 +10,7 @@ set(PROJECT_SOURCE
   level.cpp
   menu.cpp
   path-finder.cpp
+  person.cpp
   sprite-info.cpp
   world.cpp
 )

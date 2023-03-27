@@ -183,7 +183,9 @@ World::World() : map{
 
     entities.emplace_back(*this, entities.size(), blit::Point{9, 7}, entity_livingroom_tv, 3); // tv
 
-    entities.emplace_back(*this, entities.size(), blit::Point{1, 1}, entity_test); // test thing
+    auto test_person_index = entities.size();
+    entities.emplace_back(*this, test_person_index, blit::Point{1, 1}, entity_test); // test person
+    people.emplace_back(*this, test_person_index);
 }
 
 void World::render() {
@@ -282,14 +284,14 @@ void World::render() {
 }
 
 void World::update(uint32_t time) {
-    // test moving
-    entities[8].set_position({72 + int(std::sin(time / 600.0f) * 52), 72 + int(std::cos(time / 600.0f) * 32)});
-
     minute_timer++; // called from update, so 10ms
     if(minute_timer == 100) {
         minute_timer = 0;
         this->time++;
     }
+
+    for(auto &person : people)
+        person.update(time);
 }
 
 unsigned int World::create_entity(blit::Point tile_pos, const EntityInfo &info, int rotation) {
@@ -430,6 +432,10 @@ bool World::can_place_entity(blit::Point tile_pos, blit::Size ent_size, int inde
     }
 
     return true;
+}
+
+Entity &World::get_entity(unsigned int entity) {
+    return entities[entity];
 }
 
 bool World::get_walls_hidden() const {

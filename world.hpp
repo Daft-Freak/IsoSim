@@ -6,6 +6,7 @@
 #include "types/point.hpp"
 
 #include "entity.hpp"
+#include "person.hpp"
 #include "path-finder.hpp"
 #include "surface-helper.hpp"
 
@@ -37,6 +38,8 @@ public:
 
     bool can_place_entity(blit::Point tile_pos, blit::Size ent_size, int index) const;
 
+    Entity &get_entity(unsigned int entity);
+
     bool get_walls_hidden() const;
     void set_walls_hidden(bool hidden);
 
@@ -60,6 +63,8 @@ private:
     MapTile map[map_width * map_height];
 
     std::vector<Entity> entities;
+
+    std::vector<Person> people;
 
     PathFinder path_finder;
 
