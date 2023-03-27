@@ -61,6 +61,8 @@ private:
 
     std::vector<Entity> entities;
 
+    PathFinder path_finder;
+
     bool walls_hidden = false;
 
     int minute_timer = 0;

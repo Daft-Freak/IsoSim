@@ -167,7 +167,7 @@ World::World() : map{
     {},
     {},
     {},
-} {
+}, path_finder(*this) {
     tiles = blit::Surface::load(asset_iso_tile);
 
     // test entity data
