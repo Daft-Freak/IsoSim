@@ -186,26 +186,6 @@ World::World() : map{
     entities.emplace_back(*this, entities.size(), blit::Point{1, 1}, entity_test); // test thing
 }
 
-World::World(World &&other) {
-    *this = std::move(other);
-}
-
-World &World::operator=(World &&other) {
-    std::swap(tiles, other.tiles);
-
-    for(int i = 0; i < map_width * map_height; i++)
-        std::swap(map[i], other.map[i]);
-
-    for(auto &ent : other.entities)
-        entities.emplace_back(*this, entities.size(), ent.get_tile_position(), ent.get_info(), ent.get_rotation());
-
-    other.entities.clear();
-
-    std::swap(time, other.time);
-
-    return *this;
-}
-
 void World::render() {
     using blit::screen;
     using blit::Point;
