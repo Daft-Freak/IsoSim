@@ -296,14 +296,19 @@ int PathFinder::get_single_tile_collision(State &state, unsigned int x, unsigned
     blit::Point pos(static_cast<int>(x), static_cast<int>(y));
     auto tile = world.get_tile(pos.x, pos.y);
 
+    const auto wall_passable = [](int wall){
+        // TODO: less don't hardcode doors
+        return wall == 0 || wall == 3/*door*/;
+    };
+
     // check for walls
-    if(tile->walls[Side_Bottom])
+    if(!wall_passable(tile->walls[Side_Bottom]))
         ret |= CD_Down;
-    if(tile->walls[Side_Right])
+    if(!wall_passable(tile->walls[Side_Right]))
         ret |= CD_Right;
-    if(tile->walls[Side_Top])
+    if(!wall_passable(tile->walls[Side_Top]))
         ret |= CD_Up;
-    if(tile->walls[Side_Left])
+    if(!wall_passable(tile->walls[Side_Left]))
         ret |= CD_Left;
 
     if(!check_ents)
