@@ -147,6 +147,8 @@ World &World::operator=(World &&other) {
 
     other.entities.clear();
 
+    std::swap(time, other.time);
+
     return *this;
 }
 
@@ -248,6 +250,12 @@ void World::render() {
 void World::update(uint32_t time) {
     // test moving
     entities[8].set_position({72 + int(std::sin(time / 600.0f) * 52), 72 + int(std::cos(time / 600.0f) * 32)});
+
+    minute_timer++; // called from update, so 10ms
+    if(minute_timer == 100) {
+        minute_timer = 0;
+        this->time++;
+    }
 }
 
 unsigned int World::create_entity(blit::Point tile_pos, const EntityInfo &info, int rotation) {
@@ -418,4 +426,8 @@ blit::Point World::from_screen_pos(blit::Point screen) const {
 
 blit::Point World::get_scroll_offset() const {
     return {blit::screen.bounds.w / 2, 40};
+}
+
+uint32_t World::get_time() const {
+    return time;  
 }

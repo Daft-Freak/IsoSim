@@ -49,6 +49,8 @@ public:
 
     blit::Point get_scroll_offset() const;
 
+    uint32_t get_time() const;
+
 private:
     static const int tile_width = 32, tile_height = 16;
 
@@ -60,4 +62,7 @@ private:
     std::vector<Entity> entities;
 
     bool walls_hidden = false;
+
+    int minute_timer = 0;
+    uint32_t time = 0; // in minutes
 };
