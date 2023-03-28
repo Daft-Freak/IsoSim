@@ -3,9 +3,30 @@
 #include "person.hpp"
 #include "world.hpp"
 
+
 enum PersonBTVariables {
     PersonVar_EntIndex = behaviour_tree::Var_User,
-    PersonVar_WorldPtr
+    PersonVar_WorldPtr,
+    PersonVar_Position
+};
+
+class RandomPositionNode final : public behaviour_tree::Node {
+public:
+
+    void init(BehaviourTreeState &state) const override {}
+
+    void deinit(BehaviourTreeState &state) const override {}
+
+    behaviour_tree::Status update(BehaviourTreeState &state) const override {
+        auto world = std::any_cast<World *>(state.get_variable(PersonVar_WorldPtr));
+
+        auto bounds = world->get_bounds();
+        blit::Point target_pos(blit::random() % bounds.w, blit::random() % bounds.h);
+
+        state.set_variable(PersonVar_Position, target_pos);
+
+        return behaviour_tree::Status::Success;
+    };
 };
 
 class MoveToNode final : public behaviour_tree::Node {
@@ -26,9 +47,9 @@ public:
         // start path find
         auto start_pos = world->get_entity(entity_index).get_tile_position();
 
-        // TODO: not random
-        auto bounds = world->get_bounds();
-        blit::Point target_pos(blit::random() % bounds.w, blit::random() % bounds.h);
+        blit::Point target_pos;
+        if(state.has_variable(PersonVar_Position)) // TODO: fail if not set?
+            target_pos = std::any_cast<blit::Point>(state.get_variable(PersonVar_Position));
 
         node_state->path_id = world->get_path_finder().start_path_find(start_pos, target_pos, {1, 1});
     }
@@ -84,9 +105,12 @@ public:
     };
 };
 
+static const RandomPositionNode random_pos;
 static const MoveToNode move_to;
 
-static const behaviour_tree::RepeaterNode tree_root(&move_to);
+static const behaviour_tree::SequenceNode<2> move_sequence({&random_pos, &move_to});
+
+static const behaviour_tree::RepeaterNode tree_root(&move_sequence);
 
 Person::Person(World &world, uint16_t entity_index) : world(world), entity_index(entity_index), behaviour_tree(&tree_root) {
     behaviour_tree.set_variable(PersonVar_EntIndex, entity_index);
