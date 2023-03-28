@@ -2,6 +2,7 @@
 #include <cstdint>
 
 #include "path-finder.hpp"
+#include "behaviour-tree.hpp"
 
 class World;
 
@@ -16,15 +17,11 @@ public:
 
     uint16_t get_entity_index() const;
 
-    // for debugging
-    const PathFinder::Path &get_path() const {return path;}
-
 private:
     World &world;
     uint16_t entity_index;
 
-    PathFinder::Path path;
-    unsigned int cur_path_point = 0;
+    BehaviourTreeState behaviour_tree;
 
     blit::Point move_start_pos, move_target_pos;
     int move_progress;
