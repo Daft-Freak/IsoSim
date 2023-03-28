@@ -14,6 +14,8 @@ public:
     bool is_moving() const;
     void move_to_tile(blit::Point tile_pos);
 
+    uint16_t get_entity_index() const;
+
     // for debugging
     const PathFinder::Path &get_path() const {return path;}
 

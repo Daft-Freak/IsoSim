@@ -40,6 +40,8 @@ public:
 
     Entity &get_entity(unsigned int entity);
 
+    Person *find_person(unsigned int entity);
+
     PathFinder &get_path_finder();
 
     bool get_walls_hidden() const;

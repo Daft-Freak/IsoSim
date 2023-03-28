@@ -440,6 +440,15 @@ Entity &World::get_entity(unsigned int entity) {
     return entities[entity];
 }
 
+Person *World::find_person(unsigned int entity) {
+    for(auto &person : people) {
+        if(person.get_entity_index() == entity)
+            return &person;
+    }
+
+    return nullptr;
+}
+
 PathFinder &World::get_path_finder() {
     return path_finder;
 }
