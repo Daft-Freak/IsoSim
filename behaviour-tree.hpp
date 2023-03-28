@@ -43,6 +43,12 @@ namespace behaviour_tree {
         Running,
     };
 
+    enum VariableID {
+        Var_TempStatus = 0, // used for passing status back to composite node
+
+        Var_User
+    };
+
     class Node {
     public:
         virtual void init(BehaviourTreeState &state) const = 0;
@@ -89,7 +95,7 @@ namespace behaviour_tree {
                 bool is_resume = state.is_active(*it);
                 Status status = Status::Success;
                 if(is_resume) {
-                    status = std::any_cast<Status>(state.get_variable(0));
+                    status = std::any_cast<Status>(state.get_variable(Var_TempStatus));
                 } else {
                     state.push_active(*it);
                     status = (*it)->update(state);

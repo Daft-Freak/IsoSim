@@ -12,7 +12,7 @@ void BehaviourTreeState::update() {
             return;
 
         // return status to parent
-        set_variable(0, status);
+        set_variable(behaviour_tree::Var_TempStatus, status);
     }
 
     // root node finished
