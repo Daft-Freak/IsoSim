@@ -11,6 +11,9 @@ public:
 
     void update(uint32_t time);
 
+    bool is_moving() const;
+    void move_to_tile(blit::Point tile_pos);
+
     // for debugging
     const PathFinder::Path &get_path() const {return path;}
 
@@ -20,5 +23,7 @@ private:
 
     PathFinder::Path path;
     unsigned int cur_path_point = 0;
-    int cur_path_progress = 0;
+
+    blit::Point move_start_pos, move_target_pos;
+    int move_progress;
 };

@@ -23,23 +23,29 @@ void Person::update(uint32_t time) {
                 break;
         }
 
-        cur_path_point = 0;
-    } else if(cur_path_progress < 32) {
-        cur_path_progress++;
-    } else {
-        cur_path_point++;
-        cur_path_progress = 0;
+        cur_path_point = 1;
+        move_to_tile(path.path[cur_path_point]);
     }
 
-    // move along path
-    if(!path.path.empty()) {
-        if(cur_path_point + 1 == path.path.size())
-            entity.set_tile_position(path.path[cur_path_point]);
-        else {
-            // center of tile in 16ths
-            auto cur_pos = path.path[cur_path_point] * 16 + blit::Point(8, 8);
-            auto next_pos = path.path[cur_path_point + 1] * 16 + blit::Point(8, 8);
-            entity.set_position(cur_pos + (next_pos - cur_pos) * cur_path_progress / 32);
-        }
+    // move
+    if(is_moving()) {
+        move_progress++;
+        entity.set_position(move_start_pos + (move_target_pos - move_start_pos) * move_progress / 32);
+    } else {
+        // next in path
+        cur_path_point++;
+        if(cur_path_point < path.path.size())
+            move_to_tile(path.path[cur_path_point]);
     }
+}
+
+bool Person::is_moving() const {
+    return move_start_pos != move_target_pos && world.get_entity(entity_index).get_position() != move_target_pos;
+}
+
+void Person::move_to_tile(blit::Point tile_pos) {
+    move_target_pos = tile_pos * 16 + blit::Point(8, 8);
+    move_start_pos = world.get_entity(entity_index).get_position();
+
+    move_progress = 0;
 }
