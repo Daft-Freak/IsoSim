@@ -105,10 +105,35 @@ public:
     };
 };
 
+// sit there and think for a bit
+class ThinkNode final : public behaviour_tree::Node {
+public:
+    void init(BehaviourTreeState &state) const override {
+        int timer = blit::random() % 1000;
+        state.create_node_state(this, timer);
+    }
+
+    void deinit(BehaviourTreeState &state) const override {
+        state.destroy_node_state(this);
+    }
+
+    behaviour_tree::Status update(BehaviourTreeState &state) const override {
+        using behaviour_tree::Status;
+
+        auto &timer = std::any_cast<int &>(state.get_node_state(this));
+
+        if(--timer == 0)
+            return Status::Success;
+
+        return Status::Running;
+    };
+};
+
 static const RandomPositionNode random_pos;
 static const MoveToNode move_to;
+static const ThinkNode think;
 
-static const behaviour_tree::SequenceNode<2> move_sequence({&random_pos, &move_to});
+static const behaviour_tree::SequenceNode<3> move_sequence({&random_pos, &move_to, &think});
 
 static const behaviour_tree::RepeaterNode tree_root(&move_sequence);
 
