@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.9)
 project(isosim)
 
 set(PROJECT_SOURCE
+  behaviour-tree.cpp
   edit-mode.cpp
   entity.cpp
   entity-info.cpp
