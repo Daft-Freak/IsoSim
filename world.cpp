@@ -290,6 +290,8 @@ void World::update(uint32_t time) {
         this->time++;
     }
 
+    path_finder.update();
+
     for(auto &person : people)
         person.update(time);
 }
