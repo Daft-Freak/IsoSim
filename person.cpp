@@ -109,7 +109,7 @@ public:
 class ThinkNode final : public behaviour_tree::Node {
 public:
     void init(BehaviourTreeState &state) const override {
-        int timer = blit::random() % 1000;
+        int timer = blit::random() % 1000 + 1;
         state.create_node_state(this, timer);
     }
 
