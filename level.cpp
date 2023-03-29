@@ -46,9 +46,22 @@ void Level::render() {
 
     world->render();
 
+    // time
     char buf[100];
     format_time(world->get_time(), buf, sizeof(buf));
 
     screen.pen = {0xFF, 0xFF, 0xFF};
     screen.text(buf, blit::minimal_font, {10, 10});
+
+    // needs
+    auto &person = world->get_person(0);
+
+    auto need = person.get_need(Person::Need::Sleep);
+
+    screen.pen = {0, 0, 0};
+    screen.rectangle({10, 200, 50, 5});
+
+    screen.pen = {255, 255, 255};
+    int val = static_cast<int>(need * 50 + 0.5f);
+    screen.rectangle({10, 200, val, 5});
 }

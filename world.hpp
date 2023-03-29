@@ -40,6 +40,7 @@ public:
 
     Entity &get_entity(unsigned int entity);
 
+    Person &get_person(unsigned int person);
     Person *find_person(unsigned int entity);
 
     PathFinder &get_path_finder();

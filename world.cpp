@@ -440,6 +440,10 @@ Entity &World::get_entity(unsigned int entity) {
     return entities[entity];
 }
 
+Person &World::get_person(unsigned int person) {
+    return people[person];
+}
+
 Person *World::find_person(unsigned int entity) {
     for(auto &person : people) {
         if(person.get_entity_index() == entity)

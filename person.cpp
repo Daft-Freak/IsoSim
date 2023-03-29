@@ -145,6 +145,13 @@ Person::Person(World &world, uint16_t entity_index) : world(world), entity_index
 void Person::update(uint32_t time) {
     auto &entity = world.get_entity(entity_index);
 
+    // update needs
+    get_need(Need::Sleep) -= 0.00001f;
+
+    for(auto &need : needs)
+        need = std::max(0.0f, std::min(1.0f, need));
+
+    // run behaviour
     behaviour_tree.update();
 
     // move
@@ -167,4 +174,8 @@ void Person::move_to_tile(blit::Point tile_pos) {
 
 uint16_t Person::get_entity_index() const {
     return entity_index;
+}
+
+float &Person::get_need(Need need) {
+    return needs[static_cast<int>(need)];
 }
