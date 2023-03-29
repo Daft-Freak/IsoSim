@@ -253,13 +253,10 @@ public:
                 return Status::Failed;
 
             node_state.started_sleep = true;
-           
-            printf("in bed %u\n", world->get_time());
             return Status::Running;
         } else if(in_bed && person->get_need(Person::Need::Sleep) == 1.0f) {
             // get out
             person->move_to_tile(node_state.orig_pos);
-            printf("out bed %u\n", world->get_time());
             return Status::Running;
         }
 
