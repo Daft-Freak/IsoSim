@@ -113,6 +113,47 @@ namespace behaviour_tree {
         }
     };
 
+    template<std::size_t N>
+    class SelectorNode : public CompositeNode<N> {
+    public:
+        using CompositeNode<N>::CompositeNode;
+
+        void init(BehaviourTreeState &state) const override {
+            state.create_node_state(this, this->children.begin());
+        }
+        void deinit(BehaviourTreeState &state) const override {
+            state.destroy_node_state(this);
+        }
+
+        Status update(BehaviourTreeState &state) const override {
+            // run children in order, stop at first success
+            using ChildIterator = typename decltype(this->children)::const_iterator;
+
+            auto &it = std::any_cast<ChildIterator &>(state.get_node_state(this));
+
+            for(; it != this->children.end(); ++it) {
+
+                bool is_resume = state.is_active(*it);
+                Status status = Status::Success;
+                if(is_resume) {
+                    status = std::any_cast<Status>(state.get_variable(Var_TempStatus));
+                } else {
+                    state.push_active(*it);
+                    status = (*it)->update(state);
+
+                    if(status == Status::Running)
+                        return status; // in progress, exit and resume later
+                }
+
+                state.pop_active();
+                
+                if(status == Status::Success)
+                    return status;
+            }
+            return Status::Failed;
+        }
+    };
+
     class RepeaterNode final : public DecoratorNode {
     public:
         using DecoratorNode::DecoratorNode;
