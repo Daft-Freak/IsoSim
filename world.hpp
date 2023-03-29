@@ -39,6 +39,10 @@ public:
     bool can_place_entity(blit::Point tile_pos, blit::Size ent_size, int index) const;
 
     Entity &get_entity(unsigned int entity);
+    std::vector<unsigned int> get_entities_for_need(Person::Need need) const;
+    std::vector<unsigned int> get_entities_on_tile(blit::Point tile_pos) const;
+
+    bool has_entity_for_need(blit::Point tile_pos, Person::Need need) const;
 
     Person &get_person(unsigned int person);
     Person *find_person(unsigned int entity);

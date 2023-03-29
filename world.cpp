@@ -440,6 +440,54 @@ Entity &World::get_entity(unsigned int entity) {
     return entities[entity];
 }
 
+std::vector<unsigned int> World::get_entities_for_need(Person::Need need) const {
+    std::vector<unsigned int> ret;
+
+    unsigned int index = 0;
+    for(auto &entity : entities) {
+        if(entity.get_info().need_effect[static_cast<int>(need)] > 0.0f)
+            ret.push_back(index);
+
+        index++;
+    }
+
+    return ret;
+}
+
+std::vector<unsigned int> World::get_entities_on_tile(blit::Point tile_pos) const {
+    blit::Rect map_rect(0, 0, map_width, map_height);
+    if(!map_rect.contains(tile_pos))
+        return {};
+
+    std::vector<unsigned int> ret;
+
+    auto &tile = map[tile_pos.x + tile_pos.y * map_width];
+
+    for(auto &ent : tile.entities) {
+        // TODO: look for real ent for 0xFF
+        if(ent && ent != 0xFF)
+            ret.push_back(ent - 1);
+    }
+
+    return ret;
+}
+
+bool World::has_entity_for_need(blit::Point tile_pos, Person::Need need) const {
+    blit::Rect map_rect(0, 0, map_width, map_height);
+    if(!map_rect.contains(tile_pos))
+        return false;
+
+    auto &tile = map[tile_pos.x + tile_pos.y * map_width];
+
+    for(auto &ent : tile.entities) {
+        // TODO: look for real ent for 0xFF
+        if(ent && ent != 0xFF && entities[ent - 1].get_info().need_effect[static_cast<int>(need)] > 0.0f)
+            return true;
+    }
+
+    return false;
+}
+
 Person &World::get_person(unsigned int person) {
     return people[person];
 }
