@@ -148,6 +148,18 @@ void Person::update(uint32_t time) {
     // update needs
     get_need(Need::Sleep) -= 0.00001f;
 
+    // apply affects of entity we're "using"
+    auto ents = world.get_entities_on_tile(entity.get_tile_position());
+
+    for(auto ent_id : ents) {
+        auto &ent_info = world.get_entity(ent_id).get_info();
+
+        for(size_t i = 0; i < std::size(needs); i++) {
+            needs[i] += ent_info.need_effect[i];
+        }
+    }
+
+    // clamp
     for(auto &need : needs)
         need = std::max(0.0f, std::min(1.0f, need));
 
