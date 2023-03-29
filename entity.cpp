@@ -3,6 +3,8 @@
 
 Entity::Entity(World &world, uint16_t index, blit::Point pos, const EntityInfo &info, int rotation) : world(world), index(index), sprite_index(0), info(info) {
     sprite_index = info.base_sprite + rotation;
+
+    position = {-16, -16};
     set_tile_position(pos);
 }
 
