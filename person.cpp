@@ -169,9 +169,11 @@ public:
     };
 };
 
-// are we tired?
-class CheckTiredNode final : public behaviour_tree::Node {
+// check need
+class IsNeedLowNode final : public behaviour_tree::Node {
 public:
+    constexpr IsNeedLowNode(Person::Need need) : need(need){}
+
     void init(BehaviourTreeState &state) const override {}
 
     void deinit(BehaviourTreeState &state) const override {}
@@ -188,17 +190,22 @@ public:
         if(!person)
             return Status::Failed;
 
-        // TODO: also check if it's late?
+        // TODO: fall back to lowest need?
 
-        return person->get_need(Person::Need::Sleep) < 0.2f ? Status::Success : Status::Failed;
+        return person->get_need(need) < 0.2f ? Status::Success : Status::Failed;
     };
+
+private:
+    Person::Need need;
 };
 
-class SleepNode final : public behaviour_tree::Node {
+class UseUntilNeedRestoredNode final : public behaviour_tree::Node {
 public:
+    constexpr UseUntilNeedRestoredNode(Person::Need need) : need(need){}
+
     struct State {
         blit::Point orig_pos;
-        bool started_sleep = false;
+        bool started_use = false;
     };
 
     void init(BehaviourTreeState &state) const override {
@@ -232,16 +239,16 @@ public:
         if(person->is_moving())
             return Status::Running;
 
-        // should be next to or on a bed
+        // should be next to or on the object
         auto &ent = world->get_entity(entity_index);
-        bool in_bed = world->has_entity_for_need(ent.get_tile_position(), Person::Need::Sleep);
+        bool in_object = world->has_entity_for_need(ent.get_tile_position(), need);
 
-        if(!in_bed && !node_state.started_sleep) {
-            // find the bed
+        if(!in_object && !node_state.started_use) {
+            // find the object
             static const blit::Point offsets[]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
             for(auto &off : offsets) {
-                if(world->has_entity_for_need(ent.get_tile_position() + off, Person::Need::Sleep)) {
+                if(world->has_entity_for_need(ent.get_tile_position() + off, need)) {
                     // get in
                     person->move_to_tile(ent.get_tile_position() + off);
                     break;
@@ -252,16 +259,19 @@ public:
             if(!person->is_moving())
                 return Status::Failed;
 
-            node_state.started_sleep = true;
+            node_state.started_use = true;
             return Status::Running;
-        } else if(in_bed && person->get_need(Person::Need::Sleep) == 1.0f) {
+        } else if(in_object && person->get_need(need) == 1.0f) {
             // get out
             person->move_to_tile(node_state.orig_pos);
             return Status::Running;
         }
 
-        return in_bed ? Status::Running : Status::Success;
+        return in_object ? Status::Running : Status::Success;
     };
+
+private:
+    Person::Need need;
 };
 
 static const RandomPositionNode random_pos;
@@ -270,10 +280,11 @@ static const ThinkNode think;
 
 static const behaviour_tree::SequenceNode<3> move_sequence({&random_pos, &move_to, &think});
 
-static const CheckTiredNode check_tired;
+static const IsNeedLowNode check_tired(Person::Need::Sleep);
 static const FindEntityPositionForNeed find_bed(Person::Need::Sleep);
-static const SleepNode sleep;
+static const UseUntilNeedRestoredNode sleep(Person::Need::Sleep);
 
+// TODO: also check if it's late?
 static const behaviour_tree::SequenceNode<4> sleep_sequence({&check_tired, &find_bed, &move_to, &sleep});
 
 static const behaviour_tree::SelectorNode<2> idle_selector({&sleep_sequence, &move_sequence});
