@@ -211,16 +211,12 @@ public:
     constexpr UseUntilNeedRestoredNode(Person::Need need) : need(need){}
 
     struct State {
-        blit::Point orig_pos;
         bool started_use = false;
+        unsigned int ent_id;
     };
 
     void init(BehaviourTreeState &state) const override {
-        auto entity_index = std::any_cast<uint16_t>(state.get_variable(PersonVar_EntIndex));
-        auto world = std::any_cast<World *>(state.get_variable(PersonVar_WorldPtr));
-
         State node_state;
-        node_state.orig_pos = world->get_entity(entity_index).get_tile_position();
 
         state.create_node_state(this, node_state);
     }
@@ -256,8 +252,12 @@ public:
 
             for(auto &off : offsets) {
                 if(world->has_entity_for_need(ent.get_tile_position() + off, need)) {
+                    // assume it's the first one
+                    node_state.ent_id = world->get_entities_on_tile(ent.get_tile_position() + off)[0];
                     // get in
-                    person->move_to_tile(ent.get_tile_position() + off);
+                    if(!person->start_using_entity(node_state.ent_id))
+                        return Status::Failed;
+
                     break;
                 }
             }
@@ -270,7 +270,9 @@ public:
             return Status::Running;
         } else if(in_object && person->get_need(need) == 1.0f) {
             // get out
-            person->move_to_tile(node_state.orig_pos);
+            if(!person->stop_using_entity(node_state.ent_id))
+                return Status::Failed;
+
             return Status::Running;
         }
 
@@ -343,10 +345,8 @@ void Person::update(uint32_t time) {
     bool is_sleeping = false;
 
     // apply affects of entity we're "using"
-    auto ents = world.get_entities_on_tile(entity.get_tile_position());
-
-    for(auto ent_id : ents) {
-        auto &ent_info = world.get_entity(ent_id).get_info();
+    if(entity_in_use != ~0u && !is_moving()) {
+        auto &ent_info = world.get_entity(entity_in_use).get_info();
 
         is_sleeping = is_sleeping || ent_info.need_effect[0] > 0.0f; // assume in bed == sleeping
 
@@ -408,4 +408,52 @@ Person::Need Person::get_lowest_need() const {
     }
 
     return ret;
+}
+
+bool Person::start_using_entity(unsigned int entity) {
+    if(entity_in_use != ~0u)
+        return false;
+
+    auto ent_pos = world.get_entity(entity).get_tile_position();
+    auto dist = ent_pos - world.get_entity(entity_index).get_tile_position();
+    
+    if(dist.x + dist.y > 1)
+        return false;
+
+    // move into/on top of entity
+    if(dist.x + dist.y != 0)
+        move_to_tile(ent_pos);
+
+    entity_in_use = entity;
+    
+    return true;
+}
+
+bool Person::stop_using_entity(unsigned int entity) {
+
+    if(entity_in_use != entity)
+        return false;
+
+    auto &ent = world.get_entity(entity);
+    auto ent_pos = ent.get_tile_position();
+    auto self_pos = world.get_entity(entity_index).get_tile_position();
+
+    if(self_pos == ent_pos) {
+        // get out of entity
+        auto target_pos = ent_pos;
+
+        switch(ent.get_rotation()) {
+            case 0: target_pos.y++; break;
+            case 1: target_pos.x++; break;
+            case 2: target_pos.y--; break;
+            case 3: target_pos.x--; break;
+        }
+
+        // TODO: check for empty adjacent tile
+        move_to_tile(target_pos);
+    }
+
+    entity_in_use = ~0u;
+
+    return true;
 }

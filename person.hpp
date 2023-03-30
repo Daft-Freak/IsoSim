@@ -28,6 +28,9 @@ public:
     float &get_need(Need need);
     Need get_lowest_need() const;
 
+    bool start_using_entity(unsigned int entity);
+    bool stop_using_entity(unsigned int entity);
+
 private:
     World &world;
     uint16_t entity_index;
@@ -38,4 +41,6 @@ private:
     int move_progress;
 
     float needs[5];
+
+    unsigned int entity_in_use = ~0u;
 };
