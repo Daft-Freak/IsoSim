@@ -23,6 +23,9 @@ public:
         auto bounds = world->get_bounds();
         blit::Point target_pos(blit::random() % bounds.w, blit::random() % bounds.h);
 
+        if(!world->get_entities_on_tile(target_pos).empty())
+            return behaviour_tree::Status::Failed;
+
         state.set_variable(PersonVar_Position, target_pos);
 
         return behaviour_tree::Status::Success;
