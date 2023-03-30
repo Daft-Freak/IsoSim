@@ -193,9 +193,13 @@ public:
         if(!person)
             return Status::Failed;
 
-        // TODO: fall back to lowest need?
+        // do something if really low, or the lowest
+        auto need_val = person->get_need(need);
+        if(need_val < 0.2f || (person->get_lowest_need() == need && need_val < 0.5f)) {
+            return Status::Success;
+        }
 
-        return person->get_need(need) < 0.2f ? Status::Success : Status::Failed;
+        return Status::Failed;
     };
 
 private:
@@ -390,4 +394,18 @@ uint16_t Person::get_entity_index() const {
 
 float &Person::get_need(Need need) {
     return needs[static_cast<int>(need)];
+}
+
+Person::Need Person::get_lowest_need() const {
+    auto ret = Need::Sleep;
+    auto lowest = needs[0];
+
+    for(size_t i = 1; i < std::size(needs); i++) {
+        if(needs[i] < lowest) {
+            lowest = needs[i];
+            ret = static_cast<Need>(i);
+        }
+    }
+
+    return ret;
 }

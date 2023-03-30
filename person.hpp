@@ -26,6 +26,7 @@ public:
     uint16_t get_entity_index() const;
 
     float &get_need(Need need);
+    Need get_lowest_need() const;
 
 private:
     World &world;
