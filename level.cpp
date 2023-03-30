@@ -56,12 +56,18 @@ void Level::render() {
     // needs
     auto &person = world->get_person(0);
 
-    auto need = person.get_need(Person::Need::Sleep);
+    auto draw_bar = [](blit::Point pos, float need) {
+        screen.pen = {0, 0, 0};
+        screen.rectangle({pos.x, pos.y, 50, 5});
 
-    screen.pen = {0, 0, 0};
-    screen.rectangle({10, 200, 50, 5});
+        screen.pen = {255, 255, 255};
+        int val = static_cast<int>(need * 50 + 0.5f);
+        screen.rectangle({pos.x, pos.y, val, 5});
+    };
 
-    screen.pen = {255, 255, 255};
-    int val = static_cast<int>(need * 50 + 0.5f);
-    screen.rectangle({10, 200, val, 5});
+    draw_bar({10, 200}, person.get_need(Person::Need::Sleep));
+    draw_bar({10, 207}, person.get_need(Person::Need::Hunger));
+    draw_bar({10, 214}, person.get_need(Person::Need::Hygiene));
+    draw_bar({10, 221}, person.get_need(Person::Need::Toilet));
+    draw_bar({10, 228}, person.get_need(Person::Need::Fun));
 }

@@ -280,7 +280,7 @@ static const behaviour_tree::SelectorNode<2> idle_selector({&sleep_sequence, &mo
 
 static const behaviour_tree::RepeaterNode tree_root(&idle_selector);
 
-Person::Person(World &world, uint16_t entity_index) : world(world), entity_index(entity_index), behaviour_tree(&tree_root), needs{0.2f} {
+Person::Person(World &world, uint16_t entity_index) : world(world), entity_index(entity_index), behaviour_tree(&tree_root), needs{0.2f, 0.5f, 0.5f, 0.5f, 0.5f} {
     behaviour_tree.set_variable(PersonVar_EntIndex, entity_index);
     behaviour_tree.set_variable(PersonVar_WorldPtr, &world);
 }
@@ -290,6 +290,10 @@ void Person::update(uint32_t time) {
 
     // update needs
     get_need(Need::Sleep) -= 0.00001f;
+    get_need(Need::Hunger) -= 0.00001f;
+    get_need(Need::Hygiene) -= 0.000004f;
+    get_need(Need::Toilet) -= 0.000008f;
+    get_need(Need::Fun) -= 0.000008f;
 
     // apply affects of entity we're "using"
     auto ents = world.get_entities_on_tile(entity.get_tile_position());

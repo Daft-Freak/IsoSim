@@ -9,7 +9,11 @@ class World;
 class Person {
 public:
     enum class Need {
-        Sleep = 0
+        Sleep = 0,
+        Hunger,
+        Hygiene,
+        Toilet,
+        Fun,
     };
 
     Person(World &world, uint16_t entity_index);
@@ -32,5 +36,5 @@ private:
     blit::Point move_start_pos, move_target_pos;
     int move_progress;
 
-    float needs[1];
+    float needs[5];
 };

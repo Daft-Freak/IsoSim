@@ -7,7 +7,7 @@ public:
     uint8_t w, h;
     uint16_t base_sprite;
 
-    float need_effect[1]; // sleep
+    float need_effect[5]; // sleep, hunger, hygiene, toilet, fun
 };
 
 extern const EntityInfo entity_bathroom_shower;
