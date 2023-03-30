@@ -283,6 +283,23 @@ static const ThinkNode think;
 
 static const behaviour_tree::SequenceNode<3> move_sequence({&random_pos, &move_to, &think});
 
+// hunger
+static const IsNeedLowNode check_hungry(Person::Need::Hunger);
+static const FindEntityPositionForNeed find_food(Person::Need::Hunger);
+static const UseUntilNeedRestoredNode eat(Person::Need::Hunger);
+
+// TODO: get/make, then eat food
+static const behaviour_tree::SequenceNode<4> eat_sequence({&check_hungry, &find_food, &move_to, &eat});
+
+// toilet
+static const IsNeedLowNode check_toilet(Person::Need::Toilet);
+static const FindEntityPositionForNeed find_toilet(Person::Need::Toilet);
+static const UseUntilNeedRestoredNode use_toilet(Person::Need::Toilet);
+
+// TODO: use sink after
+static const behaviour_tree::SequenceNode<4> toilet_sequence({&check_toilet, &find_toilet, &move_to, &use_toilet});
+
+// sleep
 static const IsNeedLowNode check_tired(Person::Need::Sleep);
 static const FindEntityPositionForNeed find_bed(Person::Need::Sleep);
 static const UseUntilNeedRestoredNode sleep(Person::Need::Sleep);
@@ -290,7 +307,22 @@ static const UseUntilNeedRestoredNode sleep(Person::Need::Sleep);
 // TODO: also check if it's late?
 static const behaviour_tree::SequenceNode<4> sleep_sequence({&check_tired, &find_bed, &move_to, &sleep});
 
-static const behaviour_tree::SelectorNode<2> idle_selector({&sleep_sequence, &move_sequence});
+// hygiene
+static const IsNeedLowNode check_hygiene(Person::Need::Hygiene);
+static const FindEntityPositionForNeed find_shower(Person::Need::Hygiene); // ...or bath
+static const UseUntilNeedRestoredNode use_shower(Person::Need::Hygiene);
+
+static const behaviour_tree::SequenceNode<4> shower_sequence({&check_hygiene, &find_shower, &move_to, &use_shower});
+
+// fun
+static const IsNeedLowNode check_fun(Person::Need::Fun);
+static const FindEntityPositionForNeed find_fun(Person::Need::Fun);
+static const UseUntilNeedRestoredNode have_fun(Person::Need::Fun);
+
+static const behaviour_tree::SequenceNode<4> fun_sequence({&check_fun, &find_fun, &move_to, &have_fun});
+
+// main selector, attempt to improve a need
+static const behaviour_tree::SelectorNode<6> idle_selector({&eat_sequence, &toilet_sequence, &sleep_sequence, &shower_sequence, &fun_sequence, &move_sequence});
 
 static const behaviour_tree::RepeaterNode tree_root(&idle_selector);
 
