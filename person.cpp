@@ -414,14 +414,16 @@ bool Person::start_using_entity(unsigned int entity) {
     if(entity_in_use != ~0u)
         return false;
 
-    auto ent_pos = world.get_entity(entity).get_tile_position();
+    auto &ent = world.get_entity(entity);
+    auto ent_pos = ent.get_tile_position();
     auto dist = ent_pos - world.get_entity(entity_index).get_tile_position();
+    int use_range = ent.get_info().use_range;
     
-    if(dist.x + dist.y > 1)
+    if(dist.x + dist.y > std::max(1, use_range))
         return false;
 
     // move into/on top of entity
-    if(dist.x + dist.y != 0)
+    if(use_range == 0)
         move_to_tile(ent_pos);
 
     entity_in_use = entity;

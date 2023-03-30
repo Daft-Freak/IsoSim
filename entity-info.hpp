@@ -8,6 +8,7 @@ public:
     uint16_t base_sprite;
 
     float need_effect[5]; // sleep, hunger, hygiene, toilet, fun
+    uint8_t use_range;
 };
 
 extern const EntityInfo entity_bathroom_shower;
