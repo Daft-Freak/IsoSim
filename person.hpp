@@ -30,6 +30,7 @@ public:
 
     bool start_using_entity(unsigned int entity);
     bool stop_using_entity(unsigned int entity);
+    bool is_using_entity(unsigned int entity) const;
 
 private:
     World &world;

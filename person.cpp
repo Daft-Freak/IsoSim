@@ -244,9 +244,9 @@ public:
 
         // should be next to or on the object
         auto &ent = world->get_entity(entity_index);
-        bool in_object = world->has_entity_for_need(ent.get_tile_position(), need);
+        bool in_use = node_state.started_use && person->is_using_entity(node_state.ent_id);
 
-        if(!in_object && !node_state.started_use) {
+        if(!node_state.started_use) {
             // find the object
             static const blit::Point offsets[]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
@@ -258,17 +258,17 @@ public:
                     if(!person->start_using_entity(node_state.ent_id))
                         return Status::Failed;
 
+                    node_state.started_use = true;
                     break;
                 }
             }
 
             // couldn't find it, fail
-            if(!person->is_moving())
+            if(!node_state.started_use)
                 return Status::Failed;
-
-            node_state.started_use = true;
+            
             return Status::Running;
-        } else if(in_object && person->get_need(need) == 1.0f) {
+        } else if(in_use && person->get_need(need) == 1.0f) {
             // get out
             if(!person->stop_using_entity(node_state.ent_id))
                 return Status::Failed;
@@ -276,7 +276,7 @@ public:
             return Status::Running;
         }
 
-        return in_object ? Status::Running : Status::Success;
+        return in_use ? Status::Running : Status::Success;
     };
 
 private:
@@ -456,4 +456,8 @@ bool Person::stop_using_entity(unsigned int entity) {
     entity_in_use = ~0u;
 
     return true;
+}
+
+bool Person::is_using_entity(unsigned int entity) const {
+    return entity_in_use == entity;
 }
