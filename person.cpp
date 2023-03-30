@@ -289,11 +289,8 @@ void Person::update(uint32_t time) {
     auto &entity = world.get_entity(entity_index);
 
     // update needs
-    get_need(Need::Sleep) -= 0.00001f;
-    get_need(Need::Hunger) -= 0.00001f;
-    get_need(Need::Hygiene) -= 0.000004f;
-    get_need(Need::Toilet) -= 0.000008f;
-    get_need(Need::Fun) -= 0.000008f;
+
+    bool is_sleeping = false;
 
     // apply affects of entity we're "using"
     auto ents = world.get_entities_on_tile(entity.get_tile_position());
@@ -301,10 +298,20 @@ void Person::update(uint32_t time) {
     for(auto ent_id : ents) {
         auto &ent_info = world.get_entity(ent_id).get_info();
 
+        is_sleeping = is_sleeping || ent_info.need_effect[0] > 0.0f; // assume in bed == sleeping
+
         for(size_t i = 0; i < std::size(needs); i++) {
             needs[i] += ent_info.need_effect[i];
         }
     }
+
+    float sleep_adjust = is_sleeping ? 0.5f : 1.0f;
+
+    get_need(Need::Sleep) -= 0.00001f;
+    get_need(Need::Hunger) -= 0.00001f * sleep_adjust;
+    get_need(Need::Hygiene) -= 0.000004f * sleep_adjust;
+    get_need(Need::Toilet) -= 0.000008f * sleep_adjust;
+    get_need(Need::Fun) -= 0.000008f * sleep_adjust;
 
     // clamp
     for(auto &need : needs)
