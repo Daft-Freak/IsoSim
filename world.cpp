@@ -170,6 +170,14 @@ World::World() : map{
 }, path_finder(*this) {
     tiles = blit::Surface::load(asset_iso_tile);
 
+    // put some "grass" outside
+    for(auto &tile : map) {
+        if(tile.floor == 0) {
+            tile.floor = 2;
+            tile.floor_colour = {25, 133, 25};
+        }
+    }
+
     // test entity data
     entities.emplace_back(*this, entities.size(), blit::Point{0, 0}, entity_bathroom_shower); // shower
     entities.emplace_back(*this, entities.size(), blit::Point{2, 0}, entity_bathroom_toilet); // toilet

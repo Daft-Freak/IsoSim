@@ -2,7 +2,7 @@
 
 const SpriteInfo sprites[] {
     { 0,  3, 4, 3, 16, 16}, // floor
-    {},
+    {12, 19, 4, 2, 16,  8}, // grass
     {}, // don't need to rotate the floor
     {},
 
