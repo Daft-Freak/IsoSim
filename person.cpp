@@ -355,7 +355,7 @@ void Person::update(uint32_t time) {
         }
     }
 
-    float sleep_adjust = is_sleeping ? 0.5f : 1.0f;
+    float sleep_adjust = is_sleeping ? 0.25f : 1.0f;
 
     get_need(Need::Sleep) -= 0.00001f;
     get_need(Need::Hunger) -= 0.00001f * sleep_adjust;
