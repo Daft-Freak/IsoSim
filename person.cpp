@@ -193,9 +193,9 @@ public:
         if(!person)
             return Status::Failed;
 
-        // do something if really low, or the lowest
+        // do something if really low, or low and another need isn't really low
         auto need_val = person->get_need(need);
-        if(need_val < 0.2f || (person->get_lowest_need() == need && need_val < 0.5f)) {
+        if(need_val < 0.2f || (person->get_need(person->get_lowest_need()) >= 0.2f && need_val < 0.5f)) {
             return Status::Success;
         }
 
