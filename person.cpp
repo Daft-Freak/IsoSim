@@ -206,6 +206,51 @@ private:
     Person::Need need;
 };
 
+class ShouldSleepNode final : public behaviour_tree::Node {
+public:
+    void init(BehaviourTreeState &state) const override {}
+
+    void deinit(BehaviourTreeState &state) const override {}
+
+    behaviour_tree::Status update(BehaviourTreeState &state) const override {
+        using behaviour_tree::Status;
+
+        auto entity_index = std::any_cast<uint16_t>(state.get_variable(PersonVar_EntIndex));
+        auto world = std::any_cast<World *>(state.get_variable(PersonVar_WorldPtr));
+
+        // get person
+        auto person = world->find_person(entity_index);
+
+        if(!person)
+            return Status::Failed;
+
+        auto ent_ids = world->get_entities_for_need(Person::Need::Sleep);
+
+        if(ent_ids.empty())
+            return Status::Failed; // can't sleep if there are no beds
+
+        // get effect on need, assume all beds are the same
+        // FIXME: hardcoded decay
+        auto need_decay = 0.00001f;
+        auto bed_effect = world->get_entity(ent_ids[0]).get_info().need_effect[0] - need_decay;
+
+        // figure out when we would wake up
+        float sleep_duration = (1.0f - person->get_need(Person::Need::Sleep)) / bed_effect;
+        float time_to_empty = person->get_need(Person::Need::Sleep) / need_decay;
+        auto wake_time = world->get_time(sleep_duration);
+
+        auto now_time = world->get_time();
+
+        // don't sleep if we would get up at some silly time the next day... or the same day
+        // sleep anyway if we'll pass out soon (in an hour)
+        // TODO: adjust for work start time
+        if((wake_time.hours < 6 || (now_time.hours > 6 && wake_time.days == now_time.days)) && time_to_empty > 100 * 60)
+            return Status::Failed;
+
+        return Status::Success;
+    };
+};
+
 class UseUntilNeedRestoredNode final : public behaviour_tree::Node {
 public:
     constexpr UseUntilNeedRestoredNode(Person::Need need) : need(need){}
@@ -307,11 +352,11 @@ static const behaviour_tree::SequenceNode<4> toilet_sequence({&check_toilet, &fi
 
 // sleep
 static const IsNeedLowNode check_tired(Person::Need::Sleep);
+static const ShouldSleepNode should_sleep; // TODO: switch order and pass the bed here?
 static const FindEntityPositionForNeed find_bed(Person::Need::Sleep);
 static const UseUntilNeedRestoredNode sleep(Person::Need::Sleep);
 
-// TODO: also check if it's late?
-static const behaviour_tree::SequenceNode<4> sleep_sequence({&check_tired, &find_bed, &move_to, &sleep});
+static const behaviour_tree::SequenceNode<5> sleep_sequence({&check_tired, &should_sleep, &find_bed, &move_to, &sleep});
 
 // hygiene
 static const IsNeedLowNode check_hygiene(Person::Need::Hygiene);
