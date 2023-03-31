@@ -67,7 +67,7 @@ public:
 
     blit::Point get_scroll_offset() const;
 
-    Time get_time() const;
+    Time get_time(uint32_t offset = 0) const;
     uint32_t get_timestamp() const;
 
 private:

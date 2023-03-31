@@ -547,11 +547,16 @@ blit::Point World::get_scroll_offset() const {
     return {blit::screen.bounds.w / 2, 40};
 }
 
-World::Time World::get_time() const {
-    uint8_t seconds = minute_timer * 60 / 100;
-    uint8_t minutes = time % 60;
-    uint8_t hours = (time / 60) % 24;
-    uint32_t days = time / (24 * 60);
+World::Time World::get_time(uint32_t offset) const {
+
+    int offset_timer = minute_timer + offset;
+    uint32_t offset_time = time + (offset_timer / 100);
+    offset_timer %= 100;
+
+    uint8_t seconds = offset_timer * 60 / 100;
+    uint8_t minutes = offset_time % 60;
+    uint8_t hours = (offset_time / 60) % 24;
+    uint32_t days = offset_time / (24 * 60);
     uint8_t day_of_week = days % 7;
 
     return {
