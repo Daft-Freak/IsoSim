@@ -21,6 +21,12 @@ struct MapTile {
 
 class World final {
 public:
+    struct Time {
+        uint8_t seconds, minutes, hours;
+        uint8_t day_of_week;
+        uint32_t days;        
+    };
+
     World();
 
     void render();
@@ -61,7 +67,8 @@ public:
 
     blit::Point get_scroll_offset() const;
 
-    uint32_t get_time() const;
+    Time get_time() const;
+    uint32_t get_timestamp() const;
 
 private:
     static const int tile_width = 32, tile_height = 16;
