@@ -35,6 +35,8 @@ public:
     bool is_using_entity(unsigned int entity) const;
     unsigned int get_entity_in_use() const;
 
+    bool is_sleeping() const;
+
 private:
     World &world;
     uint16_t entity_index;

@@ -32,7 +32,14 @@ void Level::update(uint32_t time) {
         return;
     }
 
-    world->update(time);
+    int speed = 1;
+
+    // fast-forward through boring parts
+    if(!world->check_people_available())
+        speed = 20;
+
+    for(int i = 0; i < speed; i++)
+        world->update(time);
 }
 
 void Level::render() {

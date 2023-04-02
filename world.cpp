@@ -509,6 +509,18 @@ Person *World::find_person(unsigned int entity) {
     return nullptr;
 }
 
+// checks if there is any person awake and not otherwise busy
+bool World::check_people_available() const {
+    for(auto &person : people) {
+        if(person.is_sleeping())
+            continue;
+
+        return true;
+    }
+
+    return false;
+}
+
 PathFinder &World::get_path_finder() {
     return path_finder;
 }

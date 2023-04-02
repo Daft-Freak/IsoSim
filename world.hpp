@@ -53,6 +53,8 @@ public:
     Person &get_person(unsigned int person);
     Person *find_person(unsigned int entity);
 
+    bool check_people_available() const;
+
     PathFinder &get_path_finder();
 
     bool get_walls_hidden() const;

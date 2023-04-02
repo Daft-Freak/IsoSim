@@ -545,3 +545,14 @@ bool Person::is_using_entity(unsigned int entity) const {
 unsigned int Person::get_entity_in_use() const {
     return entity_in_use;
 }
+
+bool Person::is_sleeping() const {
+    if(entity_in_use == ~0u || is_moving())
+        return false;
+
+    auto &ent_info = world.get_entity(entity_in_use).get_info();
+
+    // assume in bed == sleeping
+    // also assume using an object that restores sleep need == in a bed
+    return ent_info.need_effect[0] > 0.0f;
+}
