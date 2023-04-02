@@ -21,6 +21,8 @@ public:
     void pop_active();
     bool is_active(const Node *node) const;
 
+    const char *get_attive_node_label() const;
+
     bool has_variable(uint32_t id) const;
     std::any &get_variable(uint32_t id);
     void set_variable(uint32_t id, std::any val);
@@ -55,6 +57,8 @@ namespace behaviour_tree {
         virtual void deinit(BehaviourTreeState &state) const = 0;
 
         virtual Status update(BehaviourTreeState &state) const = 0;
+
+        virtual const char *get_label() const = 0;
     };
 
     template<std::size_t N>
@@ -111,6 +115,10 @@ namespace behaviour_tree {
             }
             return Status::Success;
         }
+
+        const char *get_label() const override {
+            return "Sequence";
+        }
     };
 
     template<std::size_t N>
@@ -152,6 +160,10 @@ namespace behaviour_tree {
             }
             return Status::Failed;
         }
+
+        const char *get_label() const override {
+            return "Selector";
+        }
     };
 
     class RepeaterNode final : public DecoratorNode {
@@ -162,5 +174,9 @@ namespace behaviour_tree {
         void deinit(BehaviourTreeState &state) const override {}
 
         Status update(BehaviourTreeState &state) const override;
+
+        const char *get_label() const override {
+            return "Repeater";
+        }
     };
 }

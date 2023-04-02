@@ -34,6 +34,13 @@ bool BehaviourTreeState::is_active(const Node *node) const {
     return active_nodes.front() == node;
 }
 
+const char *BehaviourTreeState::get_attive_node_label() const {
+    if(active_nodes.empty())
+        return "";
+
+    return active_nodes.front()->get_label();
+}
+
 bool BehaviourTreeState::has_variable(uint32_t id) const {
     auto it = variables.find(id);
 

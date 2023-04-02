@@ -29,7 +29,11 @@ public:
         state.set_variable(PersonVar_Position, target_pos);
 
         return behaviour_tree::Status::Success;
-    };
+    }
+
+    const char *get_label() const override {
+        return "Get random position";
+    }
 };
 
 class FindEntityPositionForNeed final : public behaviour_tree::Node {
@@ -66,7 +70,11 @@ public:
         state.set_variable(PersonVar_Position, target_pos);
 
         return Status::Success;
-    };
+    }
+
+    const char *get_label() const override {
+        return "Find entity";
+    }
 
 private:
     Person::Need need;
@@ -145,7 +153,11 @@ public:
         }
 
         return Status::Running;
-    };
+    }
+
+    const char *get_label() const override {
+        return "Move to";
+    }
 };
 
 // sit there and think for a bit
@@ -169,7 +181,11 @@ public:
             return Status::Success;
 
         return Status::Running;
-    };
+    }
+
+    const char *get_label() const override {
+        return "Think";
+    }
 };
 
 // check need
@@ -200,7 +216,11 @@ public:
         }
 
         return Status::Failed;
-    };
+    }
+
+    const char *get_label() const override {
+        return "Check need";
+    }
 
 private:
     Person::Need need;
@@ -248,7 +268,11 @@ public:
             return Status::Failed;
 
         return Status::Success;
-    };
+    }
+
+    const char *get_label() const override {
+        return "Should sleep";
+    }
 };
 
 class UseUntilNeedRestoredNode final : public behaviour_tree::Node {
@@ -322,7 +346,11 @@ public:
         }
 
         return in_use ? Status::Running : Status::Success;
-    };
+    }
+
+    const char *get_label() const override {
+        return "Use until restored";
+    }
 
 private:
     Person::Need need;
