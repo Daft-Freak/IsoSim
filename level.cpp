@@ -5,6 +5,7 @@
 
 #include "edit-mode.hpp"
 #include "game.hpp"
+#include "sprite-info.hpp"
 #include "world.hpp"
 
 static void format_time(const World::Time &time, char *buf, size_t buf_size) {
@@ -66,4 +67,13 @@ void Level::render() {
     draw_bar({10, 214}, person.get_need(Person::Need::Hygiene));
     draw_bar({10, 221}, person.get_need(Person::Need::Toilet));
     draw_bar({10, 228}, person.get_need(Person::Need::Fun));
+
+    // current action
+    auto ent_in_use_id = person.get_entity_in_use();
+    if(ent_in_use_id != ~0u) {
+        auto &sprite = sprites[world->get_entity(ent_in_use_id).get_sprite_base_index()];
+
+        blit::Point pos(screen.bounds.w - 28, 228);
+        screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {pos.x - (sprite.sheet_w * 8 / 2), pos.y - sprite.center_y});
+    }
 }
