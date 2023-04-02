@@ -23,6 +23,8 @@ public:
     bool is_moving() const;
     void move_to_tile(blit::Point tile_pos);
 
+    const char *get_action_label() const;
+
     uint16_t get_entity_index() const;
 
     float &get_need(Need need);

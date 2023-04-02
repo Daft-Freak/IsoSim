@@ -50,6 +50,10 @@ void Level::render() {
     screen.pen = {0xFF, 0xFF, 0xFF};
     screen.text(buf, blit::minimal_font, {10, 10});
 
+    // bg for info
+    screen.pen = {0xFF, 0xFF, 0xFF, 0x80};
+    screen.rectangle({0, 196, screen.bounds.w, 44});
+
     // needs
     auto &person = world->get_person(0);
 
@@ -76,4 +80,7 @@ void Level::render() {
         blit::Point pos(screen.bounds.w - 28, 228);
         screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {pos.x - (sprite.sheet_w * 8 / 2), pos.y - sprite.center_y});
     }
+
+    screen.pen = {0, 0, 0};
+    screen.text(person.get_action_label(), blit::minimal_font, {screen.bounds.w - 2, screen.bounds.h}, true, blit::TextAlign::bottom_right);
 }

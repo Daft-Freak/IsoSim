@@ -461,6 +461,11 @@ void Person::move_to_tile(blit::Point tile_pos) {
     move_progress = 0;
 }
 
+
+const char *Person::get_action_label() const {
+    return behaviour_tree.get_attive_node_label();
+}
+
 uint16_t Person::get_entity_index() const {
     return entity_index;
 }
