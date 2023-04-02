@@ -14,9 +14,14 @@ static void format_time(const World::Time &time, char *buf, size_t buf_size) {
     snprintf(buf, buf_size, "%s %02i:%02i", day_names[time.day_of_week], time.hours, time.minutes);
 }
 
-Level::Level(Game *game, std::shared_ptr<World> world) : game(game), world(world) {
+Level::Level(Game *game, std::shared_ptr<World> world) : game(game), world(world), menu("Live Mode", {{Menu_EditMode, "Edit mode"}}) {
     if(!world)
         this->world = std::make_shared<World>();
+
+    int menu_w = blit::screen.bounds.w / 3;
+    int menu_x = blit::screen.bounds.w - menu_w;
+    menu.set_display_rect({menu_x, 0, menu_w, blit::screen.bounds.h});
+    menu.set_on_item_activated(std::bind(&Level::on_menu_activated, this, std::placeholders::_1));
 }
 
 Level::~Level() {
@@ -24,15 +29,18 @@ Level::~Level() {
 
 void Level::update(uint32_t time) {
 
-    if(blit::buttons.released & blit::Button::Y)
-        world->set_walls_hidden(!world->get_walls_hidden());
+    if(blit::buttons.released & blit::Button::MENU)
+        show_menu = !show_menu;
 
-    if(blit::buttons.released & blit::Button::MENU) {
-        game->change_state<EditMode>(world);
+    if(show_menu) {
+        menu.update(time);
         return;
     }
 
-    int speed = 1;
+    if(blit::buttons.released & blit::Button::Y)
+        world->set_walls_hidden(!world->get_walls_hidden());
+
+    int speed = 10;
 
     // fast-forward through boring parts
     if(!world->check_people_available())
@@ -90,4 +98,15 @@ void Level::render() {
 
     screen.pen = {0, 0, 0};
     screen.text(person.get_action_label(), blit::minimal_font, {screen.bounds.w - 2, screen.bounds.h}, true, blit::TextAlign::bottom_right);
+
+    if(show_menu)
+        menu.render();
+}
+
+void Level::on_menu_activated(const Menu::Item &item) {
+    switch(item.id) {
+        case Menu_EditMode:
+            game->change_state<EditMode>(std::move(world));
+            break;
+    }
 }

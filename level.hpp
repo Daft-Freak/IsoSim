@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "game-state.hpp"
+#include "menu.hpp"
 #include "world.hpp"
 
 class Game;
@@ -16,7 +17,16 @@ public:
     void render() override;
 
 private:
+    enum MenuItem {
+        Menu_EditMode = 0,
+    };
+
+    void on_menu_activated(const Menu::Item &item);
+
     Game *game;
 
     std::shared_ptr<World> world;
+
+    Menu menu;
+    bool show_menu = false;
 };
