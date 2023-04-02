@@ -20,6 +20,7 @@ public:
     blit::Point get_offset_in_tile() const;
 
     uint16_t get_sprite_index() const;
+    uint16_t get_sprite_base_index() const;
 
     int get_rotation() const;
     void set_rotation(int rotation);

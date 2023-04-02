@@ -508,3 +508,7 @@ bool Person::stop_using_entity(unsigned int entity) {
 bool Person::is_using_entity(unsigned int entity) const {
     return entity_in_use == entity;
 }
+
+unsigned int Person::get_entity_in_use() const {
+    return entity_in_use;
+}

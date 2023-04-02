@@ -41,6 +41,11 @@ uint16_t Entity::get_sprite_index() const {
     return sprite_index;
 }
 
+// unrotated sprite
+uint16_t Entity::get_sprite_base_index() const {
+    return info.base_sprite;
+}
+
 int Entity::get_rotation() const {
     return sprite_index - info.base_sprite;
 }
