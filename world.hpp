@@ -73,6 +73,8 @@ public:
     uint32_t get_timestamp() const;
 
 private:
+    unsigned int find_real_entity_id(blit::Point tile_pos, int index) const;
+
     static const int tile_width = 32, tile_height = 16;
 
     OwnedSurface tiles;

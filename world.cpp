@@ -471,10 +471,15 @@ std::vector<unsigned int> World::get_entities_on_tile(blit::Point tile_pos) cons
 
     auto &tile = map[tile_pos.x + tile_pos.y * map_width];
 
-    for(auto &ent : tile.entities) {
-        // TODO: look for real ent for 0xFF
+    int index = 0;
+    for(auto ent : tile.entities) {
+        if(ent == 0xFF)
+            ent = find_real_entity_id(tile_pos, index);
+
         if(ent && ent != 0xFF)
             ret.push_back(ent - 1);
+
+        index++;
     }
 
     return ret;
@@ -487,10 +492,15 @@ bool World::has_entity_for_need(blit::Point tile_pos, Person::Need need) const {
 
     auto &tile = map[tile_pos.x + tile_pos.y * map_width];
 
-    for(auto &ent : tile.entities) {
-        // TODO: look for real ent for 0xFF
+    int index = 0;
+    for(auto ent : tile.entities) {
+        if(ent == 0xFF)
+            ent = find_real_entity_id(tile_pos, index);
+
         if(ent && ent != 0xFF && entities[ent - 1].get_info().need_effect[static_cast<int>(need)] > 0.0f)
             return true;
+
+        index++;
     }
 
     return false;
@@ -582,4 +592,35 @@ World::Time World::get_time(uint32_t offset) const {
 
 uint32_t World::get_timestamp() const {
     return time;  
+}
+
+unsigned int World::find_real_entity_id(blit::Point tile_pos, int index) const {
+    auto check_pos = [this, index](int x, int y) -> unsigned int {
+        auto ent = map[x + y * map_width].entities[index];
+        if(!ent || ent == 0xFF)
+            return 0;
+
+        auto ent_size = entities[ent - 1].get_size();
+
+        if(blit::Rect({x, y}, ent_size).contains({x, y}))
+            return ent;
+        
+        return 0;
+    };
+
+    // so far biggest objects are 2x1/1x2, so just check adjacent tiles
+    unsigned int ent;
+    if(tile_pos.x > 0 && (ent = check_pos(tile_pos.x - 1, tile_pos.y)))
+        return ent;
+
+    if(tile_pos.x < map_width - 1 && (ent = check_pos(tile_pos.x + 1, tile_pos.y)))
+        return ent;
+
+    if(tile_pos.y > 0 && (ent = check_pos(tile_pos.x, tile_pos.y - 1)))
+        return ent;
+
+    if(tile_pos.y < map_height - 1 && (ent = check_pos(tile_pos.x, tile_pos.y + 1)))
+        return ent;
+
+    return 0xFF;
 }
