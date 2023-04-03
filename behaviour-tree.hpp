@@ -17,6 +17,8 @@ public:
 
     void update();
 
+    bool interrupt();
+
     void push_active(const Node *node);
     void pop_active();
     bool is_active(const Node *node) const;

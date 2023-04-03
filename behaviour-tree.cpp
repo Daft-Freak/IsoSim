@@ -19,6 +19,22 @@ void BehaviourTreeState::update() {
     pop_active();
 }
 
+bool BehaviourTreeState::interrupt() {
+    // interrupt nodes until we hit something non-interruptible
+    for(auto it = active_nodes.begin(); it != active_nodes.end(); ++it) {
+        if(!(*it)->interrupt(*this)) {
+            // ignore result for root node
+            if(++it == active_nodes.end())
+                break;
+            else
+                return false;
+            
+        }
+    }
+
+    return true;
+}
+
 void BehaviourTreeState::push_active(const Node *node) {
     active_nodes.push_front(node);
     node->init(*this);
