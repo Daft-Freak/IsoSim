@@ -10,4 +10,4 @@ const EntityInfo entity_kitchen_fridge{1, 1, 40, {0.0f, 0.001f, 0.0f, 0.0f, 0.0f
 const EntityInfo entity_kitchen_oven{1, 1, 36, {}, 1};
 const EntityInfo entity_kitchen_sink{1, 1, 32, {}, 1};
 
-const EntityInfo entity_livingroom_tv{2, 1, 28, {0.0f, 0.001f, 0.0f, 0.0f, 0.0001f}, 1};
+const EntityInfo entity_livingroom_tv{2, 1, 28, {0.0f, 0.001f, 0.0f, 0.0f, 0.0001f}, 2};
