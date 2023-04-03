@@ -7,7 +7,8 @@
 enum PersonBTVariables {
     PersonVar_EntIndex = behaviour_tree::Var_User,
     PersonVar_WorldPtr,
-    PersonVar_Position
+    PersonVar_Position,
+    PersonVar_TargetRange,
 };
 
 class RandomPositionNode final : public behaviour_tree::Node {
@@ -27,6 +28,7 @@ public:
             return behaviour_tree::Status::Failed;
 
         state.set_variable(PersonVar_Position, target_pos);
+        state.remove_variable(PersonVar_TargetRange);
 
         return behaviour_tree::Status::Success;
     }
@@ -59,15 +61,10 @@ public:
         auto &ent = world->get_entity(ent_ids[0]);
         auto target_pos = ent.get_tile_position();
 
-        // adjust to the tile in front
-        switch(ent.get_rotation()) {
-            case 0: target_pos.y++; break;
-            case 1: target_pos.x++; break;
-            case 2: target_pos.y--; break;
-            case 3: target_pos.x--; break;
-        }
-
         state.set_variable(PersonVar_Position, target_pos);
+
+        int range = std::max(1, static_cast<int>(ent.get_info().use_range));
+        state.set_variable(PersonVar_TargetRange, range);
 
         return Status::Success;
     }
@@ -102,7 +99,11 @@ public:
         if(state.has_variable(PersonVar_Position)) // TODO: fail if not set?
             target_pos = std::any_cast<blit::Point>(state.get_variable(PersonVar_Position));
 
-        node_state->path_id = world->get_path_finder().start_path_find(start_pos, target_pos, {1, 1});
+        int range = 0;
+        if(state.has_variable(PersonVar_TargetRange))
+            range = std::any_cast<int>(state.get_variable(PersonVar_TargetRange));
+
+        node_state->path_id = world->get_path_finder().start_path_find(start_pos, target_pos, {1, 1}, range);
     }
 
     void deinit(BehaviourTreeState &state) const override {
