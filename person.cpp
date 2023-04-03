@@ -386,7 +386,7 @@ public:
     }
 
     const char *get_label() const override {
-        return "Use until restored";
+        return "Use";
     }
 
 private:
@@ -398,6 +398,10 @@ private:
 class UseUntilNeedRestoredNode final : public UseEntityNode {
 public:
     constexpr UseUntilNeedRestoredNode(Person::Need need, EntityAction action) : UseEntityNode(action), need(need){}
+
+    const char *get_label() const override {
+        return "Use until restored";
+    }
 
 private:
     bool should_stop(Person *person, State &node_state) const override {
