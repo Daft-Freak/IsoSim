@@ -17,7 +17,7 @@ public:
 
     void update();
 
-    bool interrupt();
+    bool interrupt(const Node *override_node = nullptr);
 
     void push_active(const Node *node);
     void pop_active();
@@ -39,6 +39,8 @@ private:
 
     std::unordered_map<uint32_t, std::any> variables;
     std::unordered_map<const Node *, std::any> node_state;
+
+    const Node *override_node = nullptr;
 };
 
 namespace behaviour_tree {

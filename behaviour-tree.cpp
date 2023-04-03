@@ -5,11 +5,35 @@ BehaviourTreeState::BehaviourTreeState(const Node *root) {
 }
 
 void BehaviourTreeState::update() {
+    // push override node if we have returned to the root
+    // assumes root node is something non-interruptible
+    if(override_node) {
+        auto tmp = active_nodes.begin();
+        bool root_active = ++tmp == active_nodes.end();
+
+        if(root_active)
+            push_active(override_node);
+    }
+
+    bool was_override = false;
+
     for(auto it = active_nodes.begin(); it != active_nodes.end(); ++it) {
+        // remove after returning to previous
+        if(was_override) {
+            was_override = false;
+            pop_active();
+        }
+
         auto status = (*it)->update(*this);
 
         if(status == behaviour_tree::Status::Running)
             return;
+
+        // finished override node
+        if(*it == override_node) {
+            was_override = true;
+            override_node = nullptr;
+        }
 
         // return status to parent
         set_variable(behaviour_tree::Var_TempStatus, status);
@@ -19,7 +43,11 @@ void BehaviourTreeState::update() {
     pop_active();
 }
 
-bool BehaviourTreeState::interrupt() {
+bool BehaviourTreeState::interrupt(const Node *override_node) {
+    // don't interrupt an interruption
+    if(this->override_node)
+        return false;
+
     // interrupt nodes until we hit something non-interruptible
     for(auto it = active_nodes.begin(); it != active_nodes.end(); ++it) {
         if(!(*it)->interrupt(*this)) {
@@ -31,6 +59,8 @@ bool BehaviourTreeState::interrupt() {
             
         }
     }
+
+    this->override_node = override_node;
 
     return true;
 }
