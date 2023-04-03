@@ -40,7 +40,7 @@ void Level::update(uint32_t time) {
     if(blit::buttons.released & blit::Button::Y)
         world->set_walls_hidden(!world->get_walls_hidden());
 
-    int speed = 10;
+    int speed = 1;
 
     // fast-forward through boring parts
     if(!world->check_people_available())
