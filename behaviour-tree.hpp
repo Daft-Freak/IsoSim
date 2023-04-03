@@ -26,6 +26,7 @@ public:
     bool has_variable(uint32_t id) const;
     std::any &get_variable(uint32_t id);
     void set_variable(uint32_t id, std::any val);
+    void remove_variable(uint32_t id);
 
     std::any &get_node_state(const Node *node);
     void create_node_state(const Node *node, std::any val);

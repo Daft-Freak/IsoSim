@@ -55,6 +55,10 @@ void BehaviourTreeState::set_variable(uint32_t id, std::any val) {
     variables[id] = val;
 }
 
+void BehaviourTreeState::remove_variable(uint32_t id) {
+    variables.erase(id);
+}
+
 std::any &BehaviourTreeState::get_node_state(const Node *node) {
     return node_state.at(node);
 }
