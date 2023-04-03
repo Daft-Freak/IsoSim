@@ -59,6 +59,8 @@ namespace behaviour_tree {
 
         virtual Status update(BehaviourTreeState &state) const = 0;
 
+        virtual bool interrupt(BehaviourTreeState &state) const = 0;
+
         virtual const char *get_label() const = 0;
     };
 
@@ -117,6 +119,10 @@ namespace behaviour_tree {
             return Status::Success;
         }
 
+        bool interrupt(BehaviourTreeState &state) const override {
+            return true; // child failure will cause this to stop anyway
+        }
+
         const char *get_label() const override {
             return "Sequence";
         }
@@ -162,6 +168,13 @@ namespace behaviour_tree {
             return Status::Failed;
         }
 
+        bool interrupt(BehaviourTreeState &state) const override {
+            using ChildIterator = typename decltype(this->children)::const_iterator;
+            std::any_cast<ChildIterator &>(state.get_node_state(this)) = this->children.end();
+
+            return true;
+        }
+
         const char *get_label() const override {
             return "Selector";
         }
@@ -175,6 +188,10 @@ namespace behaviour_tree {
         void deinit(BehaviourTreeState &state) const override {}
 
         Status update(BehaviourTreeState &state) const override;
+
+        bool interrupt(BehaviourTreeState &state) const override {
+            return false; // this node does not understand failure
+        }
 
         const char *get_label() const override {
             return "Repeater";

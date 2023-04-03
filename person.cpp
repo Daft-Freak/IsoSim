@@ -33,6 +33,10 @@ public:
         return behaviour_tree::Status::Success;
     }
 
+    bool interrupt(BehaviourTreeState &state) const override {
+        return false; // not possible to be in progress
+    }
+
     const char *get_label() const override {
         return "Get random position";
     }
@@ -67,6 +71,10 @@ public:
         state.set_variable(PersonVar_TargetRange, range);
 
         return Status::Success;
+    }
+
+    bool interrupt(BehaviourTreeState &state) const override {
+        return false; // not possible to be in progress
     }
 
     const char *get_label() const override {
@@ -156,6 +164,10 @@ public:
         return Status::Running;
     }
 
+    bool interrupt(BehaviourTreeState &state) const override {
+        return false; // TODO
+    }
+
     const char *get_label() const override {
         return "Move to";
     }
@@ -182,6 +194,10 @@ public:
             return Status::Success;
 
         return Status::Running;
+    }
+
+    bool interrupt(BehaviourTreeState &state) const override {
+        return false; // TODO
     }
 
     const char *get_label() const override {
@@ -216,6 +232,10 @@ public:
         }
 
         return Status::Failed;
+    }
+
+    bool interrupt(BehaviourTreeState &state) const override {
+        return false; // not possible to be in progress
     }
 
     const char *get_label() const override {
@@ -267,6 +287,10 @@ public:
             return Status::Failed;
 
         return Status::Success;
+    }
+
+    bool interrupt(BehaviourTreeState &state) const override {
+        return false; // not possible to be in progress
     }
 
     const char *get_label() const override {
@@ -355,6 +379,10 @@ public:
             node_state.use_ticks++;
 
         return in_use ? Status::Running : Status::Success;
+    }
+
+    bool interrupt(BehaviourTreeState &state) const override {
+        return false; // not possible to be in progress
     }
 
     const char *get_label() const override {
