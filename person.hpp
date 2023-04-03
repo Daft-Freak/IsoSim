@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 
+#include "entity-info.hpp"
 #include "path-finder.hpp"
 #include "behaviour-tree.hpp"
 
@@ -36,6 +37,8 @@ public:
     unsigned int get_entity_in_use() const;
 
     bool is_sleeping() const;
+
+    static const EntityInfo entity_info;
 
 private:
     World &world;

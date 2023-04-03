@@ -7,8 +7,6 @@
 #include "assets.hpp"
 #include "sprite-info.hpp"
 
-const EntityInfo entity_test{1, 1, 56};
-
 // TODO: this is getting silly, need something to edit this with
 static const blit::Pen default_col{}, yellow_col{255, 255, 128}, cyan_col{200, 255, 255}, green_col{50, 100, 50},
                        off_white_col{240, 240, 240}, grey60_col{60, 60, 60}, grey100_col{100, 100, 100};
@@ -192,7 +190,7 @@ World::World() : map{
     entities.emplace_back(*this, entities.size(), blit::Point{9, 7}, entity_livingroom_tv, 3); // tv
 
     auto test_person_index = entities.size();
-    entities.emplace_back(*this, test_person_index, blit::Point{1, 1}, entity_test); // test person
+    entities.emplace_back(*this, test_person_index, blit::Point{1, 1}, Person::entity_info); // test person
     people.emplace_back(*this, test_person_index);
 }
 

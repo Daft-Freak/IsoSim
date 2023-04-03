@@ -443,6 +443,8 @@ static const behaviour_tree::SelectorNode<6> idle_selector({&eat_sequence, &toil
 
 static const behaviour_tree::RepeaterNode tree_root(&idle_selector);
 
+const EntityInfo Person::entity_info{1, 1, 56, {}, 1, 0};
+
 Person::Person(World &world, uint16_t entity_index) : world(world), entity_index(entity_index), behaviour_tree(&tree_root), needs{0.2f, 0.5f, 0.5f, 0.5f, 0.5f} {
     behaviour_tree.set_variable(PersonVar_EntIndex, entity_index);
     behaviour_tree.set_variable(PersonVar_WorldPtr, &world);
