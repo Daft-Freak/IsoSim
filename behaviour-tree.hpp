@@ -133,18 +133,24 @@ namespace behaviour_tree {
     public:
         using CompositeNode<N>::CompositeNode;
 
+        using ChildIterator = typename decltype(SelectorNode::children)::const_iterator;
+        struct State {
+            ChildIterator it;
+            bool interrupted;
+        };
+
         void init(BehaviourTreeState &state) const override {
-            state.create_node_state(this, this->children.begin());
+            state.create_node_state(this, State{this->children.begin(), false});
         }
+
         void deinit(BehaviourTreeState &state) const override {
             state.destroy_node_state(this);
         }
 
         Status update(BehaviourTreeState &state) const override {
             // run children in order, stop at first success
-            using ChildIterator = typename decltype(this->children)::const_iterator;
-
-            auto &it = std::any_cast<ChildIterator &>(state.get_node_state(this));
+            auto &node_state = std::any_cast<State &>(state.get_node_state(this));
+            auto &it = node_state.it;
 
             for(; it != this->children.end(); ++it) {
 
@@ -164,13 +170,16 @@ namespace behaviour_tree {
                 
                 if(status == Status::Success)
                     return status;
+
+                if(node_state.interrupted)
+                    return Status::Failed;
             }
             return Status::Failed;
         }
 
         bool interrupt(BehaviourTreeState &state) const override {
-            using ChildIterator = typename decltype(this->children)::const_iterator;
-            std::any_cast<ChildIterator &>(state.get_node_state(this)) = this->children.end();
+            auto &node_state = std::any_cast<State &>(state.get_node_state(this));
+            node_state.interrupted = true;
 
             return true;
         }
