@@ -210,9 +210,8 @@ public:
         if(!person)
             return Status::Failed;
 
-        // do something if really low, or low and another need isn't really low
-        auto need_val = person->get_need(need);
-        if(need_val < 0.2f || (person->get_need(person->get_lowest_need()) >= 0.2f && need_val < 0.5f)) {
+        // do something if really low(less than an hour to empty), or low (less than half) and another need isn't really low
+        if(person->get_ticks_to_need_empty(need) < 100 * 60 || (person->get_ticks_to_need_empty(person->get_lowest_need()) >= 100 * 60 && person->get_need(need) < 0.5f)) {
             return Status::Success;
         }
 
@@ -537,6 +536,10 @@ float Person::get_need_decay(Need need) const {
     };
 
     return decay[static_cast<int>(need)];
+}
+
+float Person::get_ticks_to_need_empty(Need need) const {
+    return needs[static_cast<int>(need)] / get_need_decay(need);
 }
 
 bool Person::start_using_entity(unsigned int entity) {

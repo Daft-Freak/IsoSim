@@ -31,6 +31,7 @@ public:
     float &get_need(Need need);
     Need get_lowest_need() const;
     float get_need_decay(Need need) const;
+    float get_ticks_to_need_empty(Need need) const;
 
     bool start_using_entity(unsigned int entity);
     bool stop_using_entity(unsigned int entity);
