@@ -31,7 +31,7 @@ public:
 PathFinder::Path::Path() {
 }
 
-PathFinder::State::State(blit::Size size) : entity_size(size), done(false), internal(std::make_unique<PathFinderInternalState>()) {
+PathFinder::State::State(blit::Size size, int max_dist) : entity_size(size), max_dist(max_dist), done(false), internal(std::make_unique<PathFinderInternalState>()) {
 }
 
 PathFinder::State::~State() {
@@ -59,7 +59,7 @@ bool PathFinder::find_path(const blit::Point &start_pos, const blit::Point &end_
     }
 
     // can't enter end tile
-    if(get_tile_collision(state, end_pos.x, end_pos.y) == CD_All) {
+    if(state.max_dist == 0 && get_tile_collision(state, end_pos.x, end_pos.y) == CD_All) {
         path.path.clear();
         return true;
     }
@@ -106,8 +106,8 @@ bool PathFinder::find_path(const blit::Point &start_pos, const blit::Point &end_
 
         int tile = internal_state.open_order.front().tile;
 
-        //found it
-        if(tile == end_tile) {
+        //found it, or in range
+        if(tile == end_tile || (state.max_dist && get_h(tile % width, tile / width) / 10 <= state.max_dist)) {
             path.path.clear();
             //path.path.push_back(start_pos);
 
@@ -212,8 +212,8 @@ bool PathFinder::find_path(const blit::Point &start_pos, const blit::Point &end_
     return true;
 }
 
-unsigned int PathFinder::start_path_find(const blit::Point &start_pos, const blit::Point &end_pos, blit::Size size) {
-    State state(size);
+unsigned int PathFinder::start_path_find(const blit::Point &start_pos, const blit::Point &end_pos, blit::Size size, int max_dist) {
+    State state(size, max_dist);
     state.start_pos = start_pos;
     state.end_pos = end_pos;
     paths.emplace(next_path_key, std::move(state));

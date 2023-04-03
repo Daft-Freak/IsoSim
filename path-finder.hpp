@@ -22,13 +22,14 @@ public:
 
     class State {
     public:
-        State(blit::Size size = {1, 1});
+        State(blit::Size size = {1, 1}, int max_dist = 0);
         State(State &&) = default;
         ~State();
 
         State &operator=(State &&) = default;
 
         blit::Size entity_size; // how many tiles the thing we're finding a path for takes up
+        int max_dist;
 
         blit::Point start_pos, end_pos;
         bool done;
@@ -40,7 +41,7 @@ public:
 
     bool find_path(const blit::Point &start_pos, const blit::Point &end_pos, State &state, Path &path);
 
-    unsigned int start_path_find(const blit::Point &start_pos, const blit::Point &end_pos, blit::Size size);
+    unsigned int start_path_find(const blit::Point &start_pos, const blit::Point &end_pos, blit::Size size, int max_dist = 0);
     bool is_path_find_done(unsigned int key) const;
     void get_found_path(unsigned int key, Path &path) const;
     void remove_path_find(unsigned int key);
