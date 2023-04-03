@@ -318,10 +318,6 @@ int PathFinder::get_single_tile_collision(State &state, unsigned int x, unsigned
     if(pos.x >= state.start_pos.x && pos.x < state.start_pos.x + state.entity_size.w && pos.y >= state.start_pos.y && pos.y < state.start_pos.y + state.entity_size.h)
         return ret;
 
-    // ignore entities on the destination as well
-    if(pos.x >= state.end_pos.x && pos.x < state.end_pos.x + state.entity_size.w && pos.y >= state.end_pos.y && pos.y < state.end_pos.y + state.entity_size.h)
-        return ret;
-
     // check for entities
     for(auto ent : tile->entities) {
         if(ent) // TODO: allow moving through some things?
