@@ -283,6 +283,7 @@ public:
     struct State {
         bool started_use = false;
         unsigned int ent_id;
+        unsigned int use_ticks = 0;
     };
 
     void init(BehaviourTreeState &state) const override {
@@ -344,13 +345,16 @@ public:
                 return Status::Failed;
             
             return Status::Running;
-        } else if(in_use && should_stop(person)) {
+        } else if(in_use && should_stop(person, node_state)) {
             // get out
             if(!person->stop_using_entity(node_state.ent_id))
                 return Status::Failed;
 
             return Status::Running;
         }
+
+        if(node_state.started_use)
+            node_state.use_ticks++;
 
         return in_use ? Status::Running : Status::Success;
     }
@@ -360,7 +364,7 @@ public:
     }
 
 private:
-    virtual bool should_stop(Person *person) const = 0;
+    virtual bool should_stop(Person *person, State &node_state) const = 0;
 
     EntityAction action;
 };
@@ -370,11 +374,23 @@ public:
     constexpr UseUntilNeedRestoredNode(Person::Need need, EntityAction action) : UseEntityNode(action), need(need){}
 
 private:
-    bool should_stop(Person *person) const override {
+    bool should_stop(Person *person, State &node_state) const override {
         return person->get_need(need) == 1.0f;
     }
 
     Person::Need need;
+};
+
+class UseEntityForTicksNode final : public UseEntityNode {
+public:
+    constexpr UseEntityForTicksNode(EntityAction action, unsigned int ticks) : UseEntityNode(action), use_ticks(ticks){}
+
+private:
+    bool should_stop(Person *person, State &node_state) const override {
+        return node_state.use_ticks >= use_ticks;
+    }
+
+    const unsigned int use_ticks;
 };
 
 static const RandomPositionNode random_pos;
