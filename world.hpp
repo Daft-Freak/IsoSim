@@ -46,9 +46,11 @@ public:
 
     Entity &get_entity(unsigned int entity);
     std::vector<unsigned int> get_entities_for_need(Person::Need need) const;
+    std::vector<unsigned int> get_entities_for_action(uint32_t action_mask) const;
     std::vector<unsigned int> get_entities_on_tile(blit::Point tile_pos) const;
 
     bool has_entity_for_need(blit::Point tile_pos, Person::Need need) const;
+    bool has_entity_for_action(blit::Point tile_pos, uint32_t action_mask) const;
 
     Person &get_person(unsigned int person);
     Person *find_person(unsigned int entity);

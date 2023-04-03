@@ -462,6 +462,20 @@ std::vector<unsigned int> World::get_entities_for_need(Person::Need need) const 
     return ret;
 }
 
+std::vector<unsigned int> World::get_entities_for_action(uint32_t action_mask) const {
+    std::vector<unsigned int> ret;
+
+    unsigned int index = 0;
+    for(auto &entity : entities) {
+        if(entity.get_info().basic_actions & action_mask)
+            ret.push_back(index);
+
+        index++;
+    }
+
+    return ret;
+}
+
 std::vector<unsigned int> World::get_entities_on_tile(blit::Point tile_pos) const {
     blit::Rect map_rect(0, 0, map_width, map_height);
     if(!map_rect.contains(tile_pos))
@@ -498,6 +512,27 @@ bool World::has_entity_for_need(blit::Point tile_pos, Person::Need need) const {
             ent = find_real_entity_id(tile_pos, index);
 
         if(ent && ent != 0xFF && entities[ent - 1].get_info().need_effect[static_cast<int>(need)] > 0.0f)
+            return true;
+
+        index++;
+    }
+
+    return false;
+}
+
+bool World::has_entity_for_action(blit::Point tile_pos, uint32_t action_mask) const {
+    blit::Rect map_rect(0, 0, map_width, map_height);
+    if(!map_rect.contains(tile_pos))
+        return false;
+
+    auto &tile = map[tile_pos.x + tile_pos.y * map_width];
+
+    int index = 0;
+    for(auto ent : tile.entities) {
+        if(ent == 0xFF)
+            ent = find_real_entity_id(tile_pos, index);
+
+        if(ent && ent != 0xFF && entities[ent - 1].get_info().basic_actions & action_mask)
             return true;
 
         index++;
