@@ -38,9 +38,9 @@ public:
     }
 };
 
-class FindEntityPositionForNeed final : public behaviour_tree::Node {
+class FindEntityPositionForAction final : public behaviour_tree::Node {
 public:
-    constexpr FindEntityPositionForNeed(Person::Need need) : need(need){} 
+    constexpr FindEntityPositionForAction(EntityAction action) : action(action){} 
 
     void init(BehaviourTreeState &state) const override {}
 
@@ -50,7 +50,7 @@ public:
         using behaviour_tree::Status;
         auto world = std::any_cast<World *>(state.get_variable(PersonVar_WorldPtr));
 
-        auto ent_ids = world->get_entities_for_need(need);
+        auto ent_ids = world->get_entities_for_action(action);
 
         if(ent_ids.empty())
             return Status::Failed;
@@ -74,7 +74,7 @@ public:
     }
 
 private:
-    Person::Need need;
+    EntityAction action;
 };
 
 class MoveToNode final : public behaviour_tree::Node {
@@ -278,7 +278,7 @@ public:
 
 class UseUntilNeedRestoredNode final : public behaviour_tree::Node {
 public:
-    constexpr UseUntilNeedRestoredNode(Person::Need need) : need(need){}
+    constexpr UseUntilNeedRestoredNode(Person::Need need, EntityAction action) : need(need), action(action){}
 
     struct State {
         bool started_use = false;
@@ -326,7 +326,7 @@ public:
             for(int y = -range; y <= range && !node_state.started_use; y++) {
                 for(int x = -range; x <= range; x++) {
                     blit::Point off(x, y);
-                    if(world->has_entity_for_need(ent.get_tile_position() + off, need)) {
+                    if(world->has_entity_for_action(ent.get_tile_position() + off, action)) {
                         // assume it's the first one
                         node_state.ent_id = world->get_entities_on_tile(ent.get_tile_position() + off)[0];
                         // get in/start use
@@ -361,6 +361,7 @@ public:
 
 private:
     Person::Need need;
+    EntityAction action;
 };
 
 static const RandomPositionNode random_pos;
@@ -371,16 +372,16 @@ static const behaviour_tree::SequenceNode<3> move_sequence({&random_pos, &move_t
 
 // hunger
 static const IsNeedLowNode check_hungry(Person::Need::Hunger);
-static const FindEntityPositionForNeed find_food(Person::Need::Hunger);
-static const UseUntilNeedRestoredNode eat(Person::Need::Hunger);
+static const FindEntityPositionForAction find_food(Action_StoreFood);
+static const UseUntilNeedRestoredNode eat(Person::Need::Hunger, Action_StoreFood);
 
 // TODO: get/make, then eat food
 static const behaviour_tree::SequenceNode<4> eat_sequence({&check_hungry, &find_food, &move_to, &eat});
 
 // toilet
 static const IsNeedLowNode check_toilet(Person::Need::Toilet);
-static const FindEntityPositionForNeed find_toilet(Person::Need::Toilet);
-static const UseUntilNeedRestoredNode use_toilet(Person::Need::Toilet);
+static const FindEntityPositionForAction find_toilet(Action_Toilet);
+static const UseUntilNeedRestoredNode use_toilet(Person::Need::Toilet, Action_Toilet);
 
 // TODO: use sink after
 static const behaviour_tree::SequenceNode<4> toilet_sequence({&check_toilet, &find_toilet, &move_to, &use_toilet});
@@ -388,22 +389,22 @@ static const behaviour_tree::SequenceNode<4> toilet_sequence({&check_toilet, &fi
 // sleep
 static const IsNeedLowNode check_tired(Person::Need::Sleep);
 static const ShouldSleepNode should_sleep; // TODO: switch order and pass the bed here?
-static const FindEntityPositionForNeed find_bed(Person::Need::Sleep);
-static const UseUntilNeedRestoredNode sleep(Person::Need::Sleep);
+static const FindEntityPositionForAction find_bed(Action_Sleep);
+static const UseUntilNeedRestoredNode sleep(Person::Need::Sleep, Action_Sleep);
 
 static const behaviour_tree::SequenceNode<5> sleep_sequence({&check_tired, &should_sleep, &find_bed, &move_to, &sleep});
 
 // hygiene
 static const IsNeedLowNode check_hygiene(Person::Need::Hygiene);
-static const FindEntityPositionForNeed find_shower(Person::Need::Hygiene); // ...or bath
-static const UseUntilNeedRestoredNode use_shower(Person::Need::Hygiene);
+static const FindEntityPositionForAction find_shower(Action_Bathe); // ...or bath
+static const UseUntilNeedRestoredNode use_shower(Person::Need::Hygiene, Action_Bathe);
 
 static const behaviour_tree::SequenceNode<4> shower_sequence({&check_hygiene, &find_shower, &move_to, &use_shower});
 
 // fun
 static const IsNeedLowNode check_fun(Person::Need::Fun);
-static const FindEntityPositionForNeed find_fun(Person::Need::Fun);
-static const UseUntilNeedRestoredNode have_fun(Person::Need::Fun);
+static const FindEntityPositionForAction find_fun(Action_HaveFun);
+static const UseUntilNeedRestoredNode have_fun(Person::Need::Fun, Action_HaveFun);
 
 static const behaviour_tree::SequenceNode<4> fun_sequence({&check_fun, &find_fun, &move_to, &have_fun});
 
