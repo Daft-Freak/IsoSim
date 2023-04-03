@@ -276,9 +276,9 @@ public:
     }
 };
 
-class UseUntilNeedRestoredNode final : public behaviour_tree::Node {
+class UseEntityNode : public behaviour_tree::Node {
 public:
-    constexpr UseUntilNeedRestoredNode(Person::Need need, EntityAction action) : need(need), action(action){}
+    constexpr UseEntityNode(EntityAction action) : action(action){}
 
     struct State {
         bool started_use = false;
@@ -344,7 +344,7 @@ public:
                 return Status::Failed;
             
             return Status::Running;
-        } else if(in_use && person->get_need(need) == 1.0f) {
+        } else if(in_use && should_stop(person)) {
             // get out
             if(!person->stop_using_entity(node_state.ent_id))
                 return Status::Failed;
@@ -360,8 +360,21 @@ public:
     }
 
 private:
-    Person::Need need;
+    virtual bool should_stop(Person *person) const = 0;
+
     EntityAction action;
+};
+
+class UseUntilNeedRestoredNode final : public UseEntityNode {
+public:
+    constexpr UseUntilNeedRestoredNode(Person::Need need, EntityAction action) : UseEntityNode(action), need(need){}
+
+private:
+    bool should_stop(Person *person) const override {
+        return person->get_need(need) == 1.0f;
+    }
+
+    Person::Need need;
 };
 
 static const RandomPositionNode random_pos;
