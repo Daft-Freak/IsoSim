@@ -40,6 +40,13 @@ void Level::update(uint32_t time) {
     if(blit::buttons.released & blit::Button::Y)
         world->set_walls_hidden(!world->get_walls_hidden());
 
+    // cycle through people
+    if(blit::buttons.released & blit::Button::X) {
+        selected_person++;
+        if(selected_person >= world->get_num_people())
+            selected_person = 0;
+    }
+
     int speed = 1;
 
     // fast-forward through boring parts
