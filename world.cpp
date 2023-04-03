@@ -451,8 +451,13 @@ std::vector<unsigned int> World::get_entities_for_need(Person::Need need) const 
 
     unsigned int index = 0;
     for(auto &entity : entities) {
-        if(entity.get_info().need_effect[static_cast<int>(need)] > 0.0f)
-            ret.push_back(index);
+        if(entity.get_info().need_effect[static_cast<int>(need)] > 0.0f) {
+            // check if someone else is using it
+            bool allow_multi_use = entity.get_info().use_range > 1; // TODO: add a flag for this
+
+            if(allow_multi_use || !is_entity_in_use(index))
+                ret.push_back(index);
+        }
 
         index++;
     }
@@ -465,8 +470,13 @@ std::vector<unsigned int> World::get_entities_for_action(uint32_t action_mask) c
 
     unsigned int index = 0;
     for(auto &entity : entities) {
-        if(entity.get_info().basic_actions & action_mask)
-            ret.push_back(index);
+        if(entity.get_info().basic_actions & action_mask) {
+            // check if someone else is using it
+            bool allow_multi_use = entity.get_info().use_range > 1; // TODO: add a flag for this
+
+            if(allow_multi_use || !is_entity_in_use(index))
+                ret.push_back(index);
+        }
 
         index++;
     }
