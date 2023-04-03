@@ -558,6 +558,10 @@ bool World::is_entity_in_use(unsigned int entity) const {
     return false;
 }
 
+size_t World::get_num_people() const {
+    return people.size();
+}
+
 Person &World::get_person(unsigned int person) {
     return people[person];
 }

@@ -54,6 +54,7 @@ public:
 
     bool is_entity_in_use(unsigned int entity) const;
 
+    size_t get_num_people() const;
     Person &get_person(unsigned int person);
     Person *find_person(unsigned int entity);
 

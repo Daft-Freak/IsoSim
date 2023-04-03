@@ -29,4 +29,6 @@ private:
 
     Menu menu;
     bool show_menu = false;
+
+    unsigned int selected_person = 0;
 };

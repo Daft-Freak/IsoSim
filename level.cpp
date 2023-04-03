@@ -70,7 +70,7 @@ void Level::render() {
     screen.rectangle({0, 196, screen.bounds.w, 44});
 
     // needs
-    auto &person = world->get_person(0);
+    auto &person = world->get_person(selected_person);
 
     auto draw_bar = [](blit::Point pos, float need) {
         screen.pen = {0, 0, 0};
