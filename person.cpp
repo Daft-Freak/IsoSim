@@ -411,9 +411,10 @@ static const behaviour_tree::SequenceNode<4> eat_sequence({&check_hungry, &find_
 static const IsNeedLowNode check_toilet(Person::Need::Toilet);
 static const FindEntityPositionForAction find_toilet(Action_Toilet);
 static const UseUntilNeedRestoredNode use_toilet(Person::Need::Toilet, Action_Toilet);
+static const FindEntityPositionForAction find_sink(Action_WashHands);
+static const UseEntityForTicksNode use_sink(Action_WashHands, 200);
 
-// TODO: use sink after
-static const behaviour_tree::SequenceNode<4> toilet_sequence({&check_toilet, &find_toilet, &move_to, &use_toilet});
+static const behaviour_tree::SequenceNode<7> toilet_sequence({&check_toilet, &find_toilet, &move_to, &use_toilet, &find_sink, &move_to, &use_sink});
 
 // sleep
 static const IsNeedLowNode check_tired(Person::Need::Sleep);

@@ -8,6 +8,7 @@ enum EntityAction {
     Action_Bathe     = 1 << 2, // bath/shower
     Action_Toilet    = 1 << 3,
     Action_HaveFun   = 1 << 4, // things that increase fun as main function
+    Action_WashHands = 1 << 5, // sinks
 };
 
 class EntityInfo final {
