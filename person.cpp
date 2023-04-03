@@ -91,6 +91,7 @@ public:
         unsigned int path_id;
         PathFinder::Path path;
         unsigned int cur_path_point = 1;
+        bool interrupted = false;
     };
 
     void init(BehaviourTreeState &state) const override {
@@ -155,6 +156,9 @@ public:
 
         // start next move if not moving
         if(!person->is_moving()) {
+            if(node_state->interrupted)
+                return Status::Failed;
+
             if(node_state->cur_path_point < node_state->path.path.size())
                 person->move_to_tile(node_state->path.path[node_state->cur_path_point++]);
             else // no more points, done
@@ -165,7 +169,9 @@ public:
     }
 
     bool interrupt(BehaviourTreeState &state) const override {
-        return false; // TODO
+        auto node_state = std::any_cast<State *>(state.get_node_state(this));
+        node_state->interrupted = true;
+        return true;
     }
 
     const char *get_label() const override {
@@ -190,6 +196,10 @@ public:
 
         auto &timer = std::any_cast<int &>(state.get_node_state(this));
 
+        // interrupted
+        if(timer < 0)
+            return Status::Failed;
+
         if(--timer == 0)
             return Status::Success;
 
@@ -197,7 +207,9 @@ public:
     }
 
     bool interrupt(BehaviourTreeState &state) const override {
-        return false; // TODO
+        auto &timer = std::any_cast<int &>(state.get_node_state(this));
+        timer = -1;
+        return true;
     }
 
     const char *get_label() const override {
@@ -304,6 +316,7 @@ public:
 
     struct State {
         bool started_use = false;
+        bool interrupted = false;
         unsigned int ent_id;
         unsigned int use_ticks = 0;
     };
@@ -367,13 +380,16 @@ public:
                 return Status::Failed;
             
             return Status::Running;
-        } else if(in_use && should_stop(person, node_state)) {
+        } else if(in_use && (node_state.interrupted || should_stop(person, node_state))) {
             // get out
             if(!person->stop_using_entity(node_state.ent_id))
                 return Status::Failed;
 
             return Status::Running;
         }
+
+        if(node_state.interrupted)
+            return Status::Failed;
 
         if(node_state.started_use)
             node_state.use_ticks++;
@@ -382,7 +398,9 @@ public:
     }
 
     bool interrupt(BehaviourTreeState &state) const override {
-        return false; // not possible to be in progress
+        auto &node_state = std::any_cast<State &>(state.get_node_state(this));
+        node_state.interrupted = true;
+        return true;
     }
 
     const char *get_label() const override {
