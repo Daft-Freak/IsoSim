@@ -441,6 +441,50 @@ private:
     const unsigned int use_ticks;
 };
 
+// oh no
+class PassOutNode final : public behaviour_tree::Node {
+public:
+    void init(BehaviourTreeState &state) const override {
+        int timer = 90 * 100;
+        state.create_node_state(this, timer);
+    }
+
+    void deinit(BehaviourTreeState &state) const override {
+        state.destroy_node_state(this);
+    }
+
+    behaviour_tree::Status update(BehaviourTreeState &state) const override {
+        using behaviour_tree::Status;
+
+        auto &timer = std::any_cast<int &>(state.get_node_state(this));
+
+        auto entity_index = std::any_cast<uint16_t>(state.get_variable(PersonVar_EntIndex));
+        auto world = std::any_cast<World *>(state.get_variable(PersonVar_WorldPtr));
+
+        // get person
+        auto person = world->find_person(entity_index);
+
+        if(!person)
+            return Status::Failed;
+
+        person->get_need(Person::Need::Sleep) += 0.00002f;
+        person->get_need(Person::Need::Fun) -= 0.000001f; // passing out on the floor is not fun
+
+        if(--timer == 0)
+            return Status::Success;
+
+        return Status::Running;
+    }
+
+    bool interrupt(BehaviourTreeState &state) const override {
+        return false;
+    }
+
+    const char *get_label() const override {
+        return "Pass out";
+    }
+};
+
 static const RandomPositionNode random_pos;
 static const MoveToNode move_to;
 static const ThinkNode think;
@@ -491,6 +535,8 @@ static const behaviour_tree::SelectorNode<6> idle_selector({&eat_sequence, &toil
 
 static const behaviour_tree::RepeaterNode tree_root(&idle_selector);
 
+static const PassOutNode pass_out;
+
 const EntityInfo Person::entity_info{1, 1, 56, {}, 1, 0};
 
 Person::Person(World &world, uint16_t entity_index) : world(world), entity_index(entity_index), behaviour_tree(&tree_root), needs{0.2f, 0.5f, 0.5f, 0.5f, 0.5f} {
@@ -527,6 +573,10 @@ void Person::update(uint32_t time) {
     // clamp
     for(auto &need : needs)
         need = std::max(0.0f, std::min(1.0f, need));
+
+    // react to empty needs
+    if(get_need(Need::Sleep) == 0.0f)
+        behaviour_tree.interrupt(&pass_out);
 
     // run behaviour
     behaviour_tree.update();
