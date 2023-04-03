@@ -540,6 +540,12 @@ bool Person::start_using_entity(unsigned int entity) {
     if(dist.x + dist.y > std::max(1, use_range))
         return false;
 
+    // check if someone else is using it
+    bool allow_multi_use = ent.get_info().use_range > 1; // TODO: add a flag for this
+
+    if(!allow_multi_use && world.is_entity_in_use(entity))
+        return false;
+
     // move into/on top of entity
     if(use_range == 0)
         move_to_tile(ent_pos);

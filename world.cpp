@@ -539,6 +539,15 @@ bool World::has_entity_for_action(blit::Point tile_pos, uint32_t action_mask) co
     return false;
 }
 
+bool World::is_entity_in_use(unsigned int entity) const {
+    for(auto &person : people) {
+        if(person.is_using_entity(entity))
+            return true;
+    }
+
+    return false;
+}
+
 Person &World::get_person(unsigned int person) {
     return people[person];
 }

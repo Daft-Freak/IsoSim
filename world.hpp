@@ -52,6 +52,8 @@ public:
     bool has_entity_for_need(blit::Point tile_pos, Person::Need need) const;
     bool has_entity_for_action(blit::Point tile_pos, uint32_t action_mask) const;
 
+    bool is_entity_in_use(unsigned int entity) const;
+
     Person &get_person(unsigned int person);
     Person *find_person(unsigned int entity);
 
