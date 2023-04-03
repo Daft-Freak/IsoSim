@@ -251,8 +251,7 @@ public:
             return Status::Failed; // can't sleep if there are no beds
 
         // get effect on need, assume all beds are the same
-        // FIXME: hardcoded decay
-        auto need_decay = 0.00001f;
+        auto need_decay = person->get_need_decay(Person::Need::Sleep);
         auto bed_effect = world->get_entity(ent_ids[0]).get_info().need_effect[0] - need_decay;
 
         // figure out when we would wake up
@@ -470,11 +469,11 @@ void Person::update(uint32_t time) {
 
     float sleep_adjust = is_sleeping ? 0.25f : 1.0f;
 
-    get_need(Need::Sleep) -= 0.00001f;
-    get_need(Need::Hunger) -= 0.00001f * sleep_adjust;
-    get_need(Need::Hygiene) -= 0.000004f * sleep_adjust;
-    get_need(Need::Toilet) -= 0.000008f * sleep_adjust;
-    get_need(Need::Fun) -= 0.000008f * sleep_adjust;
+    get_need(Need::Sleep)   -= get_need_decay(Need::Sleep);
+    get_need(Need::Hunger)  -= get_need_decay(Need::Hunger) * sleep_adjust;
+    get_need(Need::Hygiene) -= get_need_decay(Need::Hygiene) * sleep_adjust;
+    get_need(Need::Toilet)  -= get_need_decay(Need::Toilet) * sleep_adjust;
+    get_need(Need::Fun)     -= get_need_decay(Need::Fun) * sleep_adjust;
 
     // clamp
     for(auto &need : needs)
@@ -526,6 +525,18 @@ Person::Need Person::get_lowest_need() const {
     }
 
     return ret;
+}
+
+float Person::get_need_decay(Need need) const {
+    static const float decay[]{
+        0.00001f, // sleep
+        0.00001f, // hunger
+        0.000004f, // hygiene
+        0.000008f, // toilet
+        0.000008f, // fun
+    };
+
+    return decay[static_cast<int>(need)];
 }
 
 bool Person::start_using_entity(unsigned int entity) {
