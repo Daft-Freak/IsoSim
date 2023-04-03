@@ -318,18 +318,24 @@ public:
 
         if(!node_state.started_use) {
             // find the object
-            static const blit::Point offsets[]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
+            // asuume range used for path find is object use_range
+            int range = 1;
+            if(state.has_variable(PersonVar_TargetRange))
+                range = std::any_cast<int>(state.get_variable(PersonVar_TargetRange));
 
-            for(auto &off : offsets) {
-                if(world->has_entity_for_need(ent.get_tile_position() + off, need)) {
-                    // assume it's the first one
-                    node_state.ent_id = world->get_entities_on_tile(ent.get_tile_position() + off)[0];
-                    // get in
-                    if(!person->start_using_entity(node_state.ent_id))
-                        return Status::Failed;
+            for(int y = -range; y <= range && !node_state.started_use; y++) {
+                for(int x = -range; x <= range; x++) {
+                    blit::Point off(x, y);
+                    if(world->has_entity_for_need(ent.get_tile_position() + off, need)) {
+                        // assume it's the first one
+                        node_state.ent_id = world->get_entities_on_tile(ent.get_tile_position() + off)[0];
+                        // get in/start use
+                        if(!person->start_using_entity(node_state.ent_id))
+                            return Status::Failed;
 
-                    node_state.started_use = true;
-                    break;
+                        node_state.started_use = true;
+                        break;
+                    }
                 }
             }
 
