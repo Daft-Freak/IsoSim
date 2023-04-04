@@ -1,5 +1,9 @@
 #include "sprite-info.hpp"
 
+#include "graphics/surface.hpp"
+
+using blit::SpriteTransform;
+
 const SpriteInfo sprites[] {
     { 0,  3, 4, 3, 16, 16, 0}, // floor
     {12, 20, 4, 2, 16,  8, 0}, // grass
@@ -8,32 +12,32 @@ const SpriteInfo sprites[] {
 
     // wall
     { 4,  0, 2, 6, 16, 40, 0}, // bottom
-    { 6,  0, 2, 6,  0, 40, 0}, // right
-    { 8,  0, 2, 6,  0, 48, 0}, // top
-    {10,  0, 2, 6, 16, 48, 0}, // left
+    { 4,  0, 2, 6,  0, 40, SpriteTransform::HORIZONTAL}, // right
+    { 4,  0, 2, 6,  0, 48, 0}, // top
+    { 4,  0, 2, 6, 16, 48, SpriteTransform::HORIZONTAL}, // left
 
     // wall + window
     {12,  0, 2, 6, 16, 40, 0},
-    {14,  0, 2, 6,  0, 40, 0},
-    {16,  0, 2, 6,  0, 48, 0},
-    {18,  0, 2, 6, 16, 48, 0},
+    {12,  0, 2, 6,  0, 40, SpriteTransform::HORIZONTAL},
+    {12,  0, 2, 6,  0, 48, 0},
+    {12,  0, 2, 6, 16, 48, SpriteTransform::HORIZONTAL},
 
     // wall + door
     {20,  0, 2, 6, 16, 40, 0},
-    {22,  0, 2, 6,  0, 40, 0},
-    {24,  0, 2, 6,  0, 48, 0},
-    {26,  0, 2, 6, 16, 48, 0},
+    {20,  0, 2, 6,  0, 40, SpriteTransform::HORIZONTAL},
+    {20,  0, 2, 6,  0, 48, 0},
+    {20,  0, 2, 6, 16, 48, SpriteTransform::HORIZONTAL},
 
     // hidden wall
     {28,  0, 2, 2, 16,  8, 0},
-    {30,  0, 2, 2,  0,  8, 0},
-    {28,  2, 2, 2,  0, 16, 0},
-    {30,  2, 2, 2, 16, 16, 0},
+    {28,  0, 2, 2,  0,  8, SpriteTransform::HORIZONTAL},
+    {28,  0, 2, 2,  0, 16, 0},
+    {28,  0, 2, 2, 16, 16, SpriteTransform::HORIZONTAL},
     // hidden wall + door
     {28,  4, 2, 2, 16,  8, 0},
-    {30,  4, 2, 2,  0,  8, 0},
-    {28,  6, 2, 2,  0, 16, 0},
-    {30,  6, 2, 2, 16, 16, 0},
+    {28,  4, 2, 2,  0,  8, SpriteTransform::HORIZONTAL},
+    {28,  4, 2, 2,  0, 16, 0},
+    {28,  4, 2, 2, 16, 16, SpriteTransform::HORIZONTAL},
 
     // furniture may need some adjusting
 

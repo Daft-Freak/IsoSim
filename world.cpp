@@ -235,10 +235,22 @@ void World::render() {
             // also set base col (if reusing same sprite for all walls)
             screen.sprites->palette[5] = screen.sprites->palette[5 + side];
 
+            // recolour window/door frames
+            for(int i = 2; i < 5; i++) {
+                auto col = screen.sprites->palette[i];
+                screen.sprites->palette[i] = {
+                    col.r * (col_mul_r[side] + 1) / 256,
+                    col.g * (col_mul_g[side] + 1) / 256,
+                    col.b * (col_mul_b[side] + 1) / 256
+                };
+            }
+
             draw_sprite(pos, sprites[base_sprite * 4 + side]);
 
             screen.sprites->palette[5 + side] = orig_cols[5 + side];
-            screen.sprites->palette[5] = orig_cols[5];
+
+            for(int i = 2; i < 6; i++)
+                screen.sprites->palette[i] = orig_cols[i];
         }
     };
 
