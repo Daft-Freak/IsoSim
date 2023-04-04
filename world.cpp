@@ -232,9 +232,13 @@ void World::render() {
                 wall_col.b * (col_mul_b[side] + 1) / 256
             };
 
+            // also set base col (if reusing same sprite for all walls)
+            screen.sprites->palette[5] = screen.sprites->palette[5 + side];
+
             draw_sprite(pos, sprites[base_sprite * 4 + side]);
 
             screen.sprites->palette[5 + side] = orig_cols[5 + side];
+            screen.sprites->palette[5] = orig_cols[5];
         }
     };
 
