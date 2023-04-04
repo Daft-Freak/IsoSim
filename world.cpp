@@ -207,7 +207,7 @@ void World::render() {
     memcpy(orig_cols, tiles->palette, sizeof(orig_cols));
 
     auto draw_sprite = [](Point pos, const SpriteInfo &sprite){
-        screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {pos.x - sprite.center_x, pos.y - sprite.center_y});
+        screen.sprite({sprite.sheet_x, sprite.sheet_y, sprite.sheet_w, sprite.sheet_h}, {pos.x - sprite.center_x, pos.y - sprite.center_y}, sprite.transform);
     };
 
     auto draw_wall = [this, &draw_sprite, &orig_cols](Point pos, const MapTile &tile, WallSide side) {

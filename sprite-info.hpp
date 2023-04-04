@@ -5,6 +5,7 @@
 struct SpriteInfo {
     uint8_t sheet_x, sheet_y, sheet_w, sheet_h; // in 8x8 tiles
     uint8_t center_x, center_y; // in pixels
+    uint8_t transform;
 };
 
 enum WallSide {
