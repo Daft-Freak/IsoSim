@@ -129,6 +129,8 @@ void EditMode::update(uint32_t time) {
     else if(blit::buttons.released & blit::Button::DPAD_DOWN)
         tile_cursor.y++;
 
+    world->scroll_to_tile(tile_cursor.x, tile_cursor.y);
+
     if(blit::buttons.released & blit::Button::Y)
         world->set_walls_hidden(!world->get_walls_hidden());
 
