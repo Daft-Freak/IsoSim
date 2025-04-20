@@ -69,6 +69,8 @@ public:
 
     MapTile *get_tile(int x, int y);
 
+    bool is_same_chunk(blit::Point pos_a, blit::Point pos_b) const;
+
     blit::Size get_bounds() const;
 
     blit::Point to_screen_pos(int x, int y, int z = 0) const;

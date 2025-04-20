@@ -584,7 +584,26 @@ void Person::update(uint32_t time) {
     // move
     if(is_moving()) {
         move_progress++;
-        entity.set_position(move_start_pos + (move_target_pos - move_start_pos) * move_progress / 32);
+        if(move_progress == 32 && !world.is_same_chunk(move_start_pos / 16, move_target_pos / 16)) {
+            // moving between chunks
+            // need to recreate entity in the new chunk
+            auto new_index = world.create_entity(move_target_pos / 16, entity.get_info(), entity.get_rotation());
+
+            if(new_index == ~0u) {
+                // uhoh, go back
+                entity.set_position(move_start_pos);
+                move_progress = 0;
+            } else {
+                // destroy our old self and update index
+                world.destroy_entity(entity_index);
+                entity_index = new_index;
+                behaviour_tree.set_variable(PersonVar_EntIndex, entity_index);
+
+                world.get_entity(new_index).set_position(move_target_pos);
+            }
+
+        } else // regular move
+            entity.set_position(move_start_pos + (move_target_pos - move_start_pos) * move_progress / 32);
     }
 }
 

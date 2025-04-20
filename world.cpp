@@ -743,6 +743,10 @@ MapTile *World::get_tile(int x, int y) {
     return &chunk->tiles[(x % chunk_width) + (y % chunk_height) * chunk_width];
 }
 
+bool World::is_same_chunk(blit::Point pos_a, blit::Point pos_b) const {
+    return pos_a / chunk_width == pos_b / chunk_width;
+}
+
 blit::Size World::get_bounds() const {
     return {chunk_width * map_width, chunk_height * map_height};
 }
