@@ -615,7 +615,7 @@ std::vector<unsigned int> World::get_entities_on_tile(blit::Point tile_pos) cons
             ent = find_real_entity_id(tile_pos, index);
 
         if(ent && ent != 0xFF)
-            ret.push_back(ent - 1);
+            ret.push_back(make_global_entity_id(ent - 1, chunk->x, chunk->y));
 
         index++;
     }
