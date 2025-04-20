@@ -9,7 +9,7 @@ class World;
 
 class Entity {
 public:
-    Entity(World &world, uint16_t index, blit::Point pos, const EntityInfo &info, int rotation = 0);
+    Entity(World &world, unsigned int index, blit::Point pos, const EntityInfo &info, int rotation = 0);
 
     blit::Point get_position() const;
     void set_position(blit::Point p);
@@ -32,7 +32,7 @@ public:
 private:
     World &world;
 
-    uint16_t index;
+    unsigned int index;
     uint16_t sprite_index = 0;
 
     blit::Point position; // 16ths of a tile

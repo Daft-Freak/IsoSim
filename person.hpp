@@ -17,7 +17,7 @@ public:
         Fun,
     };
 
-    Person(World &world, uint16_t entity_index);
+    Person(World &world, unsigned int entity_index);
 
     void update(uint32_t time);
 
@@ -26,7 +26,7 @@ public:
 
     const char *get_action_label() const;
 
-    uint16_t get_entity_index() const;
+    unsigned int get_entity_index() const;
 
     float &get_need(Need need);
     Need get_lowest_need() const;
@@ -44,7 +44,7 @@ public:
 
 private:
     World &world;
-    uint16_t entity_index;
+    unsigned int entity_index;
 
     BehaviourTreeState behaviour_tree;
 

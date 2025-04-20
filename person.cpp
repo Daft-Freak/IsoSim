@@ -98,7 +98,7 @@ public:
         auto node_state = new State;
         state.create_node_state(this, node_state);
 
-        auto entity_index = std::any_cast<uint16_t>(state.get_variable(PersonVar_EntIndex));
+        auto entity_index = std::any_cast<unsigned int>(state.get_variable(PersonVar_EntIndex));
         auto world = std::any_cast<World *>(state.get_variable(PersonVar_WorldPtr));
 
         // start path find
@@ -130,7 +130,7 @@ public:
         using behaviour_tree::Status;
 
         auto node_state = std::any_cast<State *>(state.get_node_state(this));
-        auto entity_index = std::any_cast<uint16_t>(state.get_variable(PersonVar_EntIndex));
+        auto entity_index = std::any_cast<unsigned int>(state.get_variable(PersonVar_EntIndex));
 
         auto world = std::any_cast<World *>(state.get_variable(PersonVar_WorldPtr));
         
@@ -229,7 +229,7 @@ public:
     behaviour_tree::Status update(BehaviourTreeState &state) const override {
         using behaviour_tree::Status;
 
-        auto entity_index = std::any_cast<uint16_t>(state.get_variable(PersonVar_EntIndex));
+        auto entity_index = std::any_cast<unsigned int>(state.get_variable(PersonVar_EntIndex));
         auto world = std::any_cast<World *>(state.get_variable(PersonVar_WorldPtr));
 
         // get person
@@ -267,7 +267,7 @@ public:
     behaviour_tree::Status update(BehaviourTreeState &state) const override {
         using behaviour_tree::Status;
 
-        auto entity_index = std::any_cast<uint16_t>(state.get_variable(PersonVar_EntIndex));
+        auto entity_index = std::any_cast<unsigned int>(state.get_variable(PersonVar_EntIndex));
         auto world = std::any_cast<World *>(state.get_variable(PersonVar_WorldPtr));
 
         // get person
@@ -336,7 +336,7 @@ public:
 
         auto &node_state = std::any_cast<State &>(state.get_node_state(this));
 
-        auto entity_index = std::any_cast<uint16_t>(state.get_variable(PersonVar_EntIndex));
+        auto entity_index = std::any_cast<unsigned int>(state.get_variable(PersonVar_EntIndex));
         auto world = std::any_cast<World *>(state.get_variable(PersonVar_WorldPtr));
 
         // get person
@@ -458,7 +458,7 @@ public:
 
         auto &timer = std::any_cast<int &>(state.get_node_state(this));
 
-        auto entity_index = std::any_cast<uint16_t>(state.get_variable(PersonVar_EntIndex));
+        auto entity_index = std::any_cast<unsigned int>(state.get_variable(PersonVar_EntIndex));
         auto world = std::any_cast<World *>(state.get_variable(PersonVar_WorldPtr));
 
         // get person
@@ -539,7 +539,7 @@ static const PassOutNode pass_out;
 
 const EntityInfo Person::entity_info{1, 1, 56, {}, 1, 0};
 
-Person::Person(World &world, uint16_t entity_index) : world(world), entity_index(entity_index), behaviour_tree(&tree_root), needs{0.2f, 0.5f, 0.5f, 0.5f, 0.5f} {
+Person::Person(World &world, unsigned int entity_index) : world(world), entity_index(entity_index), behaviour_tree(&tree_root), needs{0.2f, 0.5f, 0.5f, 0.5f, 0.5f} {
     behaviour_tree.set_variable(PersonVar_EntIndex, entity_index);
     behaviour_tree.set_variable(PersonVar_WorldPtr, &world);
 }
@@ -604,7 +604,7 @@ const char *Person::get_action_label() const {
     return behaviour_tree.get_attive_node_label();
 }
 
-uint16_t Person::get_entity_index() const {
+unsigned int Person::get_entity_index() const {
     return entity_index;
 }
 
