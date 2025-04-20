@@ -76,6 +76,7 @@ public:
     blit::Point get_scroll_offset() const;
 
     void scroll_to_tile(int x, int y, int z = 0);
+    void scroll_to_tile(int x, int y, int z, blit::Point frac_offset);
 
     Time get_time(uint32_t offset = 0) const;
     uint32_t get_timestamp() const;

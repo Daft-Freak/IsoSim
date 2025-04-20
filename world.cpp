@@ -761,6 +761,14 @@ void World::scroll_to_tile(int x, int y, int z) {
     scroll_pos = screen_center - tile_screen_pos;
 }
 
+void  World::scroll_to_tile(int x, int y, int z, blit::Point frac_offset) {
+    // TODO: offset for status bar?
+    blit::Point screen_center(blit::screen.bounds.w / 2, blit::screen.bounds.h / 2);
+    auto tile_screen_pos = to_screen_pos(x, y, z, frac_offset);
+
+    scroll_pos = screen_center - tile_screen_pos;
+}
+
 World::Time World::get_time(uint32_t offset) const {
 
     int offset_timer = minute_timer + offset;
