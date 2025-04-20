@@ -394,7 +394,7 @@ void World::destroy_entity(unsigned int entity) {
         return;
 
     if(local_id == entities.size() - 1) {
-        remove_entity(entities.back().get_tile_position(), entities.back().get_size(), local_id);
+        remove_entity(entities.back().get_tile_position(), entities.back().get_size(), entity);
         entities.pop_back();
     } else 
         entities[local_id].set_position({-16, -16}); // "remove"
