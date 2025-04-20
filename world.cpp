@@ -488,8 +488,13 @@ bool World::remove_entity(blit::Point tile_pos, blit::Size ent_size, unsigned in
 
 bool World::move_entity(blit::Point old_tile_pos, blit::Point new_tile_pos, blit::Size ent_size, unsigned int entity) {
     // fail if we can't add to the new tile
-    if(!add_entity(new_tile_pos, ent_size, entity))
+    // ignore if negative pos(removing entity)
+    if(new_tile_pos.x >= 0 && !add_entity(new_tile_pos, ent_size, entity))
         return false;
+
+    // if the old pos is invalid we're done
+    if(old_tile_pos.x < 0)
+        return true;
 
     return remove_entity(old_tile_pos, ent_size, entity);
 }
