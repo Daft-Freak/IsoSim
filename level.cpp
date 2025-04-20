@@ -72,9 +72,7 @@ void Level::render() {
     screen.pen = {0, 0xFF, 0};
     auto person_pos = person_ent.get_tile_position();
     auto marker_pos = world->get_scroll_offset()
-                    + world->to_screen_pos(person_pos.x, person_pos.y)
-                    - blit::Point(16, 8) // FIXME: tile size
-                    + person_ent.get_offset_in_tile()
+                    + world->to_screen_pos(person_pos.x, person_pos.y, 0, person_ent.get_offset_in_tile())
                     + blit::Point(0, -20);
 
     screen.line(marker_pos, marker_pos + blit::Point( 3, -3));

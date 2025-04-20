@@ -738,6 +738,10 @@ blit::Point World::to_screen_pos(int x, int y, int z) const {
     return {x * tile_width / 2 - y * tile_width / 2, y * tile_height / 2 + x * tile_height / 2 - z};
 }
 
+blit::Point World::to_screen_pos(int x, int y, int z, blit::Point frac_offset) const {
+    return to_screen_pos(x, y, z) - blit::Point(tile_width / 2, tile_height / 2) + frac_offset;
+}
+
 blit::Point World::from_screen_pos(blit::Point screen) const {
     return {
         (screen.x / 2 + screen.y + tile_height / 2) / tile_height,
