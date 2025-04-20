@@ -1,4 +1,5 @@
 #include <cstring>
+#include <utility>
 
 #include "engine/engine.hpp"
 
@@ -11,7 +12,7 @@
 static const blit::Pen default_col{}, yellow_col{255, 255, 128}, cyan_col{200, 255, 255}, green_col{50, 100, 50},
                        off_white_col{240, 240, 240}, grey60_col{60, 60, 60}, grey100_col{100, 100, 100};
 
-World::World() : map{
+static const MapTile default_chunk[]{
     // Y = 0
     {1, {0, 0, 1, 1},  {},  grey60_col, {default_col, default_col, off_white_col, off_white_col}},
     {1, {0, 0, 1, 0},  {}, grey100_col, {default_col, default_col, off_white_col,   default_col}},
@@ -165,16 +166,32 @@ World::World() : map{
     {},
     {},
     {},
-}, path_finder(*this) {
+};
+
+World::World() : path_finder(*this) {
     tiles = blit::Surface::load(asset_iso_tile);
 
-    // put some "grass" outside
-    for(auto &tile : map) {
-        if(tile.floor == 0) {
-            tile.floor = 2;
-            tile.floor_colour = {25, 133, 25};
+    // setup some defaults
+    for(int y = 0; y < map_height; y++) {
+        for(int x = 0; x < map_width; x++) {
+            chunks[x + y * map_width].x = x;
+            chunks[x + y * map_width].y = y;
         }
     }
+
+    memcpy(chunks[0].tiles, default_chunk, sizeof(default_chunk));
+
+    // put some "grass" outside
+    for(auto &chunk : chunks) {
+        for(auto &tile : chunk.tiles) {
+            if(tile.floor == 0) {
+                tile.floor = 2;
+                tile.floor_colour = {25, 133, 25};
+            }
+        }
+    }
+
+    auto &entities = chunks[0].entities;
 
     // test entity data
     entities.emplace_back(*this, entities.size(), blit::Point{0, 0}, entity_bathroom_shower); // shower
@@ -254,53 +271,57 @@ void World::render() {
         }
     };
 
-    for(int x = 0; x < map_width; x++) {
-        for(int y = 0; y < map_height; y++) {
-            auto center_pos = to_screen_pos(x, y) + offset;
+    // TODO: chunks around camera
+    // TODO: draw order
+    for(auto &chunk : chunks) {
+        for(int x = 0; x < chunk_width; x++) {
+            for(int y = 0; y < chunk_height; y++) {
+                auto center_pos = to_screen_pos(x + chunk.x * chunk_width, y + chunk.y * chunk_width) + offset;
 
-            auto &tile = map[x + y * map_width];
+                auto &tile = chunk.tiles[x + y * chunk_width];
 
-            // 0 could be a valid floor sprite, but not a wall sprite (as it's the floor)
+                // 0 could be a valid floor sprite, but not a wall sprite (as it's the floor)
 
-            // top/left walls
-            draw_wall(center_pos, tile, Side_Top);
-            draw_wall(center_pos, tile, Side_Left);
+                // top/left walls
+                draw_wall(center_pos, tile, Side_Top);
+                draw_wall(center_pos, tile, Side_Left);
 
-            // floor
-            if(tile.floor) {
-                blit::Pen floor_col{154, 128, 103};
-                if(tile.floor_colour.a)
-                    floor_col = tile.floor_colour;
+                // floor
+                if(tile.floor) {
+                    blit::Pen floor_col{154, 128, 103};
+                    if(tile.floor_colour.a)
+                        floor_col = tile.floor_colour;
 
-                tiles->palette[1] = floor_col;
-                tiles->palette[2] = {floor_col.r * 234 / 256, floor_col.g * 234 / 256, floor_col.b * 234 / 256}; // grid lines
-                tiles->palette[3] = {floor_col.r * 156 / 256, floor_col.g * 156 / 256, floor_col.b * 156 / 256}; // shading
-                tiles->palette[4] = {floor_col.r * 103 / 256, floor_col.g * 103 / 256, floor_col.b * 103 / 256}; // more shading
+                    tiles->palette[1] = floor_col;
+                    tiles->palette[2] = {floor_col.r * 234 / 256, floor_col.g * 234 / 256, floor_col.b * 234 / 256}; // grid lines
+                    tiles->palette[3] = {floor_col.r * 156 / 256, floor_col.g * 156 / 256, floor_col.b * 156 / 256}; // shading
+                    tiles->palette[4] = {floor_col.r * 103 / 256, floor_col.g * 103 / 256, floor_col.b * 103 / 256}; // more shading
 
-                draw_sprite(center_pos, sprites[tile.floor - 1]);
+                    draw_sprite(center_pos, sprites[tile.floor - 1]);
 
-                for(int i = 1; i < 5; i++)
-                    tiles->palette[i] = orig_cols[i];
-            }
-
-            for(auto ent_id : tile.entities) {
-                if(ent_id && ent_id != 0xFF) {
-                    auto &ent = entities[ent_id - 1];
-                    draw_sprite(center_pos - Point(tile_width / 2, tile_height / 2) + ent.get_offset_in_tile(), sprites[ent.get_sprite_index()]);
+                    for(int i = 1; i < 5; i++)
+                        tiles->palette[i] = orig_cols[i];
                 }
+
+                for(auto ent_id : tile.entities) {
+                    if(ent_id && ent_id != 0xFF) {
+                        auto &ent = chunk.entities[ent_id - 1];
+                        draw_sprite(center_pos - Point(tile_width / 2, tile_height / 2) + ent.get_offset_in_tile(), sprites[ent.get_sprite_index()]);
+                    }
+                }
+
+                draw_wall(center_pos, tile, Side_Bottom);
             }
+            
+            // draw right walls after drawing entire line (for objects that cover multiple tiles on the y axis)
+            // multiple x tiles is a bit broken
+            for(int y = 0; y < chunk_height; y++) {
+                auto center_pos = to_screen_pos(x + chunk.x * chunk_width, y + chunk.y * chunk_width) + offset;
 
-            draw_wall(center_pos, tile, Side_Bottom);
-        }
-        
-        // draw right walls after drawing entire line (for objects that cover multiple tiles on the y axis)
-        // multiple x tiles is a bit broken
-        for(int y = 0; y < map_height; y++) {
-            auto center_pos = to_screen_pos(x, y) + offset;
+                auto &tile = chunk.tiles[x + y * chunk_width];
 
-            auto &tile = map[x + y * map_width];
-
-            draw_wall(center_pos, tile, Side_Right);
+                draw_wall(center_pos, tile, Side_Right);
+            }
         }
     }
 }
@@ -329,55 +350,89 @@ unsigned int World::create_entity(blit::Point tile_pos, const EntityInfo &info, 
     if(!can_place_entity(tile_pos, ent_size, 0))
         return ~0;
 
+    // lookup chunk
+    auto chunk = get_chunk_from_tile(tile_pos);
+
+    if(!chunk)
+        return ~0;
+
+    auto &entities = chunk->entities;
+
     for(auto &ent : entities) {
         // "removed" entity, reuse
         if(ent.get_position() == blit::Point{-16, -16} && &ent.get_info() == &info) {
             ent.set_rotation(rotation);
             ent.set_tile_position(tile_pos);
-            return new_id;
+            return make_global_entity_id(new_id, chunk->x, chunk->y);
         }
 
         new_id++;
     }
 
+    // create new
+    new_id = make_global_entity_id(new_id, chunk->x, chunk->y);
     entities.emplace_back(*this, new_id, tile_pos, info, rotation);
 
     return new_id;
 }
 
 void World::destroy_entity(unsigned int entity) {
-    if(entity >= entities.size())
+    int chunk_x, chunk_y;
+    auto local_id = get_local_entity_id(entity, chunk_x, chunk_y);
+
+    // lookup chunk
+    auto chunk = get_chunk({chunk_x, chunk_y});
+
+    if(!chunk)
         return;
 
-    if(entity == entities.size() - 1) {
-        remove_entity(entities.back().get_tile_position(), entities.back().get_size(), entity);
+    auto &entities = chunk->entities;
+
+    if(local_id >= entities.size())
+        return;
+
+    if(local_id == entities.size() - 1) {
+        remove_entity(entities.back().get_tile_position(), entities.back().get_size(), local_id);
         entities.pop_back();
     } else 
-        entities[entity].set_position({-16, -16}); // "remove"
+        entities[local_id].set_position({-16, -16}); // "remove"
 }
 
 bool World::add_entity(blit::Point tile_pos, blit::Size ent_size, unsigned int entity) {
-    blit::Rect map_rect(0, 0, map_width, map_height);
-    if(!map_rect.contains(tile_pos))
+    // lookup chunk
+    int chunk_x, chunk_y;
+    auto local_id = get_local_entity_id(entity, chunk_x, chunk_y);
+    auto chunk = get_chunk_from_tile(tile_pos);
+
+    if(!chunk)
         return false;
+    
+    // check that pos and entity id are consistent
+    if(chunk->x != chunk_x || chunk->y != chunk_y)
+        return false;
+
+    // local tile pos
+    blit::Point local_pos(tile_pos.x % chunk_width, tile_pos.y % chunk_height);
+
+    blit::Rect map_rect(0, 0, chunk_width, chunk_height);
 
     // check full entity fits
-    if(!map_rect.contains(tile_pos - blit::Point(ent_size.w - 1, ent_size.h - 1)))
+    if(!map_rect.contains(local_pos - blit::Point(ent_size.w - 1, ent_size.h - 1)))
         return false;
 
-    auto &base_tile = map[tile_pos.x + tile_pos.y * map_width];
+    auto &base_tile = chunk->tiles[local_pos.x + local_pos.y * chunk_width];
 
     for(size_t i = 0; i < std::size(base_tile.entities); i++) {
         // already here
-        if(base_tile.entities[i] == entity + 1)
+        if(base_tile.entities[i] == local_id + 1)
             return true;
 
         if(can_place_entity(tile_pos, ent_size, i)) {
-            uint8_t id = entity + 1;
+            uint8_t id = local_id + 1;
 
             for(int y = 0; y < ent_size.h; y++) {
                 for(int x = 0; x < ent_size.w; x++) {
-                    map[tile_pos.x - x + (tile_pos.y - y) * map_width].entities[i] = id;
+                    chunk->tiles[local_pos.x - x + (local_pos.y - y) * chunk_width].entities[i] = id;
                     id = 0xFF; // only use the entity id on the first tile
                 }
             }
@@ -396,17 +451,29 @@ bool World::add_entity(blit::Point tile_pos, blit::Size ent_size, unsigned int e
 }
 
 bool World::remove_entity(blit::Point tile_pos, blit::Size ent_size, unsigned int entity) {
-    if(!blit::Rect(0, 0, map_width, map_height).contains(tile_pos))
+    // lookup chunk
+    int chunk_x, chunk_y;
+    auto local_id = get_local_entity_id(entity, chunk_x, chunk_y);
+    auto chunk = get_chunk_from_tile(tile_pos);
+
+    if(!chunk)
+        return false;
+    
+    // check that pos and entity id are consistent
+    if(chunk->x != chunk_x || chunk->y != chunk_y)
         return false;
 
-    auto &base_tile = map[tile_pos.x + tile_pos.y * map_width];
+    // local tile pos
+    blit::Point local_pos(tile_pos.x % chunk_width, tile_pos.y % chunk_height);
+
+    auto &base_tile = chunk->tiles[local_pos.x + local_pos.y * chunk_width];
 
     for(size_t i = 0; i < std::size(base_tile.entities); i++) {
-         if(base_tile.entities[i] == entity + 1) {
+         if(base_tile.entities[i] == local_id + 1) {
             // clear all tiles
             for(int y = 0; y < ent_size.h; y++) {
                 for(int x = 0; x < ent_size.w; x++) {
-                    map[tile_pos.x - x + (tile_pos.y - y) * map_width].entities[i] = 0;
+                    chunk->tiles[local_pos.x - x + (local_pos.y - y) * chunk_width].entities[i] = 0;
                 }
             }
             return true;
@@ -418,13 +485,19 @@ bool World::remove_entity(blit::Point tile_pos, blit::Size ent_size, unsigned in
 }
 
 unsigned int World::find_entity(blit::Point tile_pos, const EntityInfo &info) {
-    if(!blit::Rect(0, 0, map_width, map_height).contains(tile_pos))
+    // lookup chunk
+    auto chunk = get_chunk_from_tile(tile_pos);
+
+    if(!chunk)
         return ~0;
 
-    auto &tile = map[tile_pos.x + tile_pos.y * map_width];
+    // lookup tile in chunk
+    blit::Point local_pos(tile_pos.x % chunk_width, tile_pos.y % chunk_height);
+
+    auto &tile = chunk->tiles[local_pos.x + local_pos.y * chunk_width];
 
     for(auto ent_id : tile.entities) {
-        if(ent_id && ent_id != 0xFF && &entities[ent_id - 1].get_info() == &info)
+        if(ent_id && ent_id != 0xFF && &chunk->entities[ent_id - 1].get_info() == &info)
             return ent_id - 1;
     }
 
@@ -432,16 +505,25 @@ unsigned int World::find_entity(blit::Point tile_pos, const EntityInfo &info) {
 }
 
 bool World::can_place_entity(blit::Point tile_pos, blit::Size ent_size, int index) const {
-    blit::Rect map_rect(0, 0, map_width, map_height);
+    // lookup chunk
+    auto chunk = get_chunk_from_tile(tile_pos);
+
+    if(!chunk)
+        return false;
+
+    // local tile pos
+    blit::Point local_pos(tile_pos.x % chunk_width, tile_pos.y % chunk_height);
+
+    blit::Rect map_rect(0, 0, chunk_width, chunk_height);
 
     // check all tiles
     for(int y = 0; y < ent_size.h; y++) {
         for(int x = 0; x < ent_size.w; x++) {
             // check map bounds
-            if(!map_rect.contains({tile_pos.x - x, tile_pos.y - y}))
+            if(!map_rect.contains({local_pos.x - x, local_pos.y - y}))
                 return false;
 
-            auto &tile = map[tile_pos.x - x + (tile_pos.y - y) * map_width];
+            auto &tile = chunk->tiles[local_pos.x - x + (local_pos.y - y) * chunk_width];
 
             // check of this slot is empty AND that the previous slot isn't to avoid weird stacking
             if(tile.entities[index] || (index > 0 && !tile.entities[index - 1]))
@@ -459,23 +541,31 @@ bool World::can_place_entity(blit::Point tile_pos, blit::Size ent_size, int inde
 }
 
 Entity &World::get_entity(unsigned int entity) {
-    return entities[entity];
+    int chunk_x, chunk_y;
+    auto local_id = get_local_entity_id(entity, chunk_x, chunk_y);
+    auto chunk = get_chunk({chunk_x, chunk_y});
+    return chunk->entities[local_id];
 }
 
 std::vector<unsigned int> World::get_entities_for_need(Person::Need need) const {
     std::vector<unsigned int> ret;
 
-    unsigned int index = 0;
-    for(auto &entity : entities) {
-        if(entity.get_info().need_effect[static_cast<int>(need)] > 0.0f) {
-            // check if someone else is using it
-            bool allow_multi_use = entity.get_info().use_range > 1; // TODO: add a flag for this
+    // TODO: don't search all chunks
+    for(auto &chunk : chunks) {
+        unsigned int index = 0;
+        for(auto &entity : chunk.entities) {
+            if(entity.get_info().need_effect[static_cast<int>(need)] > 0.0f) {
+                // check if someone else is using it
+                bool allow_multi_use = entity.get_info().use_range > 1; // TODO: add a flag for this
 
-            if(allow_multi_use || !is_entity_in_use(index))
-                ret.push_back(index);
+                auto ent_id = make_global_entity_id(index, chunk.x, chunk.y);
+
+                if(allow_multi_use || !is_entity_in_use(ent_id))
+                    ret.push_back(ent_id);
+            }
+
+            index++;
         }
-
-        index++;
     }
 
     return ret;
@@ -484,30 +574,38 @@ std::vector<unsigned int> World::get_entities_for_need(Person::Need need) const 
 std::vector<unsigned int> World::get_entities_for_action(uint32_t action_mask) const {
     std::vector<unsigned int> ret;
 
-    unsigned int index = 0;
-    for(auto &entity : entities) {
-        if(entity.get_info().basic_actions & action_mask) {
-            // check if someone else is using it
-            bool allow_multi_use = entity.get_info().use_range > 1; // TODO: add a flag for this
+    // TODO: don't search all chunks
+    for(auto &chunk : chunks) {
+        unsigned int index = 0;
+        for(auto &entity : chunk.entities) {
+            if(entity.get_info().basic_actions & action_mask) {
+                // check if someone else is using it
+                bool allow_multi_use = entity.get_info().use_range > 1; // TODO: add a flag for this
 
-            if(allow_multi_use || !is_entity_in_use(index))
-                ret.push_back(index);
+                auto ent_id = make_global_entity_id(index, chunk.x, chunk.y);
+
+                if(allow_multi_use || !is_entity_in_use(ent_id))
+                    ret.push_back(ent_id);
+            }
+
+            index++;
         }
-
-        index++;
     }
 
     return ret;
 }
 
 std::vector<unsigned int> World::get_entities_on_tile(blit::Point tile_pos) const {
-    blit::Rect map_rect(0, 0, map_width, map_height);
-    if(!map_rect.contains(tile_pos))
+    auto chunk = get_chunk_from_tile(tile_pos);
+
+    if(!chunk)
         return {};
 
     std::vector<unsigned int> ret;
 
-    auto &tile = map[tile_pos.x + tile_pos.y * map_width];
+    blit::Point local_pos(tile_pos.x % chunk_width, tile_pos.y % chunk_height);
+
+    auto &tile = chunk->tiles[local_pos.x + local_pos.y * chunk_width];
 
     int index = 0;
     for(auto ent : tile.entities) {
@@ -524,18 +622,21 @@ std::vector<unsigned int> World::get_entities_on_tile(blit::Point tile_pos) cons
 }
 
 bool World::has_entity_for_need(blit::Point tile_pos, Person::Need need) const {
-    blit::Rect map_rect(0, 0, map_width, map_height);
-    if(!map_rect.contains(tile_pos))
+    auto chunk = get_chunk_from_tile(tile_pos);
+
+    if(!chunk)
         return false;
 
-    auto &tile = map[tile_pos.x + tile_pos.y * map_width];
+    blit::Point local_pos(tile_pos.x % chunk_width, tile_pos.y % chunk_height);
+
+    auto &tile = chunk->tiles[local_pos.x + local_pos.y * chunk_width];
 
     int index = 0;
     for(auto ent : tile.entities) {
         if(ent == 0xFF)
             ent = find_real_entity_id(tile_pos, index);
 
-        if(ent && ent != 0xFF && entities[ent - 1].get_info().need_effect[static_cast<int>(need)] > 0.0f)
+        if(ent && ent != 0xFF && chunk->entities[ent - 1].get_info().need_effect[static_cast<int>(need)] > 0.0f)
             return true;
 
         index++;
@@ -545,18 +646,21 @@ bool World::has_entity_for_need(blit::Point tile_pos, Person::Need need) const {
 }
 
 bool World::has_entity_for_action(blit::Point tile_pos, uint32_t action_mask) const {
-    blit::Rect map_rect(0, 0, map_width, map_height);
-    if(!map_rect.contains(tile_pos))
+    auto chunk = get_chunk_from_tile(tile_pos);
+
+    if(!chunk)
         return false;
 
-    auto &tile = map[tile_pos.x + tile_pos.y * map_width];
+    blit::Point local_pos(tile_pos.x % chunk_width, tile_pos.y % chunk_height);
+
+    auto &tile = chunk->tiles[local_pos.x + local_pos.y * chunk_width];
 
     int index = 0;
     for(auto ent : tile.entities) {
         if(ent == 0xFF)
             ent = find_real_entity_id(tile_pos, index);
 
-        if(ent && ent != 0xFF && entities[ent - 1].get_info().basic_actions & action_mask)
+        if(ent && ent != 0xFF && chunk->entities[ent - 1].get_info().basic_actions & action_mask)
             return true;
 
         index++;
@@ -616,14 +720,16 @@ void World::set_walls_hidden(bool hidden) {
 }
 
 MapTile *World::get_tile(int x, int y) {
-    if(x < 0 || y < 0 || x >= map_width || y >= map_height)
+    auto chunk = get_chunk_from_tile({x, y});
+
+    if(!chunk)
         return nullptr;
 
-    return &map[x + y * map_width];
+    return &chunk->tiles[(x % chunk_width) + (y % chunk_height) * chunk_width];
 }
 
 blit::Size World::get_bounds() const {
-    return {map_width, map_height};
+    return {chunk_width * map_width, chunk_height * map_height};
 }
 
 blit::Point World::to_screen_pos(int x, int y, int z) const {
@@ -668,11 +774,16 @@ uint32_t World::get_timestamp() const {
 
 unsigned int World::find_real_entity_id(blit::Point tile_pos, int index) const {
     auto check_pos = [this, index](int x, int y) -> unsigned int {
-        auto ent = map[x + y * map_width].entities[index];
+        auto chunk = get_chunk_from_tile({x, y});
+
+        if(!chunk)
+            return 0;
+
+        auto ent = chunk->tiles[(x % chunk_width) + (y % chunk_height) * chunk_width].entities[index];
         if(!ent || ent == 0xFF)
             return 0;
 
-        auto ent_size = entities[ent - 1].get_size();
+        auto ent_size = chunk->entities[ent - 1].get_size();
 
         if(blit::Rect({x, y}, ent_size).contains({x, y}))
             return ent;
@@ -680,19 +791,59 @@ unsigned int World::find_real_entity_id(blit::Point tile_pos, int index) const {
         return 0;
     };
 
+    auto bounds = get_bounds();
+
     // so far biggest objects are 2x1/1x2, so just check adjacent tiles
     unsigned int ent;
     if(tile_pos.x > 0 && (ent = check_pos(tile_pos.x - 1, tile_pos.y)))
         return ent;
 
-    if(tile_pos.x < map_width - 1 && (ent = check_pos(tile_pos.x + 1, tile_pos.y)))
+    if(tile_pos.x < bounds.w - 1 && (ent = check_pos(tile_pos.x + 1, tile_pos.y)))
         return ent;
 
     if(tile_pos.y > 0 && (ent = check_pos(tile_pos.x, tile_pos.y - 1)))
         return ent;
 
-    if(tile_pos.y < map_height - 1 && (ent = check_pos(tile_pos.x, tile_pos.y + 1)))
+    if(tile_pos.y < bounds.h - 1 && (ent = check_pos(tile_pos.x, tile_pos.y + 1)))
         return ent;
 
     return 0xFF;
+}
+
+unsigned int World::make_global_entity_id(unsigned int id, int chunk_x, int chunk_y) const {
+    return id | (chunk_x + chunk_y * chunk_width) << 8;
+}
+
+unsigned int World::get_local_entity_id(unsigned int id, int &chunk_x, int &chunk_y) const {
+    chunk_x = (id >> 8) % chunk_width;
+    chunk_y = (id >> 8) / chunk_width;
+
+    return id & 0xFF;
+}
+
+World::Chunk *World::get_chunk(blit::Point chunk_pos) {
+    return const_cast<World::Chunk *>(std::as_const(*this).get_chunk(chunk_pos));
+}
+
+const World::Chunk *World::get_chunk(blit::Point chunk_pos) const {
+    if(chunk_pos.x < 0 || chunk_pos.y < 0)
+        return nullptr;
+
+    for(auto &chunk : chunks){
+        if(chunk.x == chunk_pos.x && chunk.y == chunk_pos.y)
+            return &chunk;
+    }
+
+    return nullptr;
+}
+
+World::Chunk *World::get_chunk_from_tile(blit::Point tile_pos) {
+    return const_cast<World::Chunk *>(std::as_const(*this).get_chunk_from_tile(tile_pos));
+}
+
+const World::Chunk *World::get_chunk_from_tile(blit::Point tile_pos) const {
+    if(tile_pos.x < 0 || tile_pos.y < 0)
+        return nullptr;
+
+    return get_chunk(tile_pos / chunk_width); // assuming square
 }

@@ -78,16 +78,32 @@ public:
     uint32_t get_timestamp() const;
 
 private:
+    static const int chunk_width = 16, chunk_height = 16;
+
+    struct Chunk
+    {
+        uint8_t x, y;
+
+        MapTile tiles[chunk_width * chunk_height];
+        std::vector<Entity> entities;
+    };
+
     unsigned int find_real_entity_id(blit::Point tile_pos, int index) const;
+
+    unsigned int make_global_entity_id(unsigned int id, int chunk_x, int chunk_y) const;
+    unsigned int get_local_entity_id(unsigned int id, int &chunk_x, int &chunk_y) const;
+
+    Chunk *get_chunk(blit::Point chunk_pos);
+    const Chunk *get_chunk(blit::Point chunk_pos) const;
+    Chunk *get_chunk_from_tile(blit::Point tile_pos);
+    const Chunk *get_chunk_from_tile(blit::Point tile_pos) const;
 
     static const int tile_width = 32, tile_height = 16;
 
     OwnedSurface tiles;
 
-    static const int map_width = 16, map_height = 16;
-    MapTile map[map_width * map_height];
-
-    std::vector<Entity> entities;
+    static const int map_width = 2, map_height = 2;
+    Chunk chunks[map_width * map_height];
 
     std::vector<Person> people;
 
