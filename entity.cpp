@@ -14,10 +14,8 @@ blit::Point Entity::get_position() const {
 
 void Entity::set_position(blit::Point p) {
     auto old_pos = get_tile_position();
-    if((p / 16) != old_pos) {
-        world.add_entity(p / 16, get_size(), index); // TODO: check this and reject move?
-        world.remove_entity(old_pos, get_size(), index);
-    }
+    if((p / 16) != old_pos)
+        world.move_entity(old_pos, p / 16, get_size(), index); // TODO: check this and reject move?
 
     position = p;
 }

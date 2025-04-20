@@ -486,6 +486,14 @@ bool World::remove_entity(blit::Point tile_pos, blit::Size ent_size, unsigned in
     return false;
 }
 
+bool World::move_entity(blit::Point old_tile_pos, blit::Point new_tile_pos, blit::Size ent_size, unsigned int entity) {
+    // fail if we can't add to the new tile
+    if(!add_entity(new_tile_pos, ent_size, entity))
+        return false;
+
+    return remove_entity(old_tile_pos, ent_size, entity);
+}
+
 unsigned int World::find_entity(blit::Point tile_pos, const EntityInfo &info) {
     // lookup chunk
     auto chunk = get_chunk_from_tile(tile_pos);

@@ -40,6 +40,8 @@ public:
     bool add_entity(blit::Point tile_pos, blit::Size ent_size, unsigned int entity);
     bool remove_entity(blit::Point tile_pos, blit::Size ent_size, unsigned int entity);
 
+    bool move_entity(blit::Point old_tile_pos, blit::Point new_tile_pos, blit::Size ent_size, unsigned int entity);
+
     unsigned int find_entity(blit::Point tile_pos, const EntityInfo &info);
 
     bool can_place_entity(blit::Point tile_pos, blit::Size ent_size, int index) const;
