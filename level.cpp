@@ -55,6 +55,12 @@ void Level::update(uint32_t time) {
 
     for(int i = 0; i < speed; i++)
         world->update(time);
+
+    // scroll to selected person
+    auto &person = world->get_person(selected_person);
+    auto &person_ent = world->get_entity(person.get_entity_index());
+    auto person_pos = person_ent.get_tile_position();
+    world->scroll_to_tile(person_pos.x, person_pos.y, 0, person_ent.get_offset_in_tile());
 }
 
 void Level::render() {
