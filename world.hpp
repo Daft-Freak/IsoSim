@@ -74,6 +74,8 @@ public:
 
     blit::Point get_scroll_offset() const;
 
+    void scroll_to_tile(int x, int y, int z = 0);
+
     Time get_time(uint32_t offset = 0) const;
     uint32_t get_timestamp() const;
 
@@ -101,6 +103,8 @@ private:
     static const int tile_width = 32, tile_height = 16;
 
     OwnedSurface tiles;
+
+    blit::Point scroll_pos;
 
     static const int map_width = 2, map_height = 2;
     Chunk chunks[map_width * map_height];

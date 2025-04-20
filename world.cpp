@@ -171,6 +171,8 @@ static const MapTile default_chunk[]{
 World::World() : path_finder(*this) {
     tiles = blit::Surface::load(asset_iso_tile);
 
+    scroll_pos = {blit::screen.bounds.w / 2, 40};
+
     // setup some defaults
     for(int y = 0; y < map_height; y++) {
         for(int x = 0; x < map_width; x++) {
@@ -744,7 +746,15 @@ blit::Point World::from_screen_pos(blit::Point screen) const {
 }
 
 blit::Point World::get_scroll_offset() const {
-    return {blit::screen.bounds.w / 2, 40};
+    return scroll_pos;
+}
+
+void World::scroll_to_tile(int x, int y, int z) {
+    // TODO: offset for status bar?
+    blit::Point screen_center(blit::screen.bounds.w / 2, blit::screen.bounds.h / 2);
+    auto tile_screen_pos = to_screen_pos(x, y, z);
+
+    scroll_pos = screen_center - tile_screen_pos;
 }
 
 World::Time World::get_time(uint32_t offset) const {
