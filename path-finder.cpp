@@ -10,6 +10,13 @@
 #include "sprite-info.hpp"
 #include "world.hpp"
 
+struct TileInfo {
+    int cost : 28;
+    int parent_x : 2;
+    int parent_y : 2;
+};
+static_assert(sizeof(TileInfo) == sizeof(int));
+
 class OpenListEntry {
 public:
     OpenListEntry(int tile, int cost) : tile(tile), cost(cost) {}
@@ -23,7 +30,7 @@ public:
 
 class PathFinderInternalState {
 public:
-    std::vector<int> tile_parents, tile_costs;
+    std::vector<TileInfo> tile_info;
     std::unordered_set<int> closed, open;
     std::deque<OpenListEntry> open_order;
 };
@@ -69,18 +76,16 @@ bool PathFinder::find_path(const blit::Point &start_pos, const blit::Point &end_
 
     // setup state
     auto &internal_state = *state.internal;
-    if(state.start_pos != start_pos || state.end_pos != end_pos || internal_state.tile_costs.empty()) {
-        internal_state.tile_costs.clear();
-        internal_state.tile_parents.clear();
+    if(state.start_pos != start_pos || state.end_pos != end_pos || internal_state.tile_info.empty()) {
+        internal_state.tile_info.clear();
         internal_state.open.clear();
         internal_state.closed.clear();
         internal_state.open_order.clear();
 
-        internal_state.tile_parents.resize(width * height);
-        internal_state.tile_costs.resize(width * height);
+        internal_state.tile_info.resize(width * height);
         internal_state.open_order.push_back(OpenListEntry(start_tile, get_h(start_pos.x, start_pos.y)));
         internal_state.open.insert(start_tile);
-        internal_state.tile_costs[start_tile] = 0;
+        internal_state.tile_info[start_tile] = {0, 0, 0};
 
         state.start_pos = start_pos;
         state.end_pos = end_pos;
@@ -118,7 +123,8 @@ bool PathFinder::find_path(const blit::Point &start_pos, const blit::Point &end_
                 int curY = cur_tile / width;
                 path.path.emplace(path.path.begin(), curX, curY);
 
-                cur_tile = internal_state.tile_parents[cur_tile];
+                auto &info = internal_state.tile_info[cur_tile];
+                cur_tile += info.parent_x + info.parent_y * width;
             }
 
             path.path.insert(path.path.begin(), start_pos);
@@ -145,12 +151,11 @@ bool PathFinder::find_path(const blit::Point &start_pos, const blit::Point &end_
             bool in_open_list = internal_state.open.count(neighbour) != 0;
             //new tile
             if(!in_open_list) {
-                internal_state.tile_parents[neighbour] = -1;
-                internal_state.tile_costs[neighbour] = -1;
+                internal_state.tile_info[neighbour] = {-1, 0, 0};
             }
 
             //update
-            int old_cost = internal_state.tile_costs[neighbour];
+            int old_cost = internal_state.tile_info[neighbour].cost;
             //compute cost
 
             int this_cost = tile_size;
@@ -165,11 +170,12 @@ bool PathFinder::find_path(const blit::Point &start_pos, const blit::Point &end_
             if(abs(x - prev_x) && abs(y - prev_y))
                 this_cost = static_cast<int>(sqrt(this_cost * this_cost * 2));
 
-            int g_use_this = internal_state.tile_costs[tile] + this_cost;
+            int g_use_this = internal_state.tile_info[tile].cost + this_cost;
 
             if(g_use_this < old_cost || old_cost == -1) {
-                internal_state.tile_parents[neighbour] = tile;
-                internal_state.tile_costs[neighbour] = g_use_this;
+                int px = prev_x - x;
+                int py = prev_y - y;
+                internal_state.tile_info[neighbour] = {g_use_this, px, py};
 
                 auto &open_order = internal_state.open_order;
 
@@ -246,7 +252,8 @@ void PathFinder::get_found_path(unsigned int key, Path &path) const {
         int curY = cur_tile / width;
         path.path.emplace(path.path.begin(), curX, curY);
 
-        cur_tile = internal_state.tile_parents[cur_tile];
+        auto &info = internal_state.tile_info[cur_tile];
+        cur_tile += info.parent_x + info.parent_y * width;
     }
 
     path.path.insert(path.path.begin(), it->second.start_pos);
