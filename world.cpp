@@ -181,7 +181,7 @@ World::World() : path_finder(*this) {
         }
     }
 
-    memcpy(chunks[0].tiles, default_chunk, sizeof(default_chunk));
+    memcpy(chunks[4].tiles, default_chunk, sizeof(default_chunk));
 
     // put some "grass" outside
     for(auto &chunk : chunks) {
@@ -193,23 +193,25 @@ World::World() : path_finder(*this) {
         }
     }
 
-    auto &entities = chunks[0].entities;
-
     // test entity data
-    entities.emplace_back(*this, entities.size(), blit::Point{0, 0}, entity_bathroom_shower); // shower
-    entities.emplace_back(*this, entities.size(), blit::Point{2, 0}, entity_bathroom_toilet); // toilet
-    entities.emplace_back(*this, entities.size(), blit::Point{6, 0}, entity_kitchen_oven); // oven
-    entities.emplace_back(*this, entities.size(), blit::Point{7, 0}, entity_kitchen_sink); // kitchen sink
-    entities.emplace_back(*this, entities.size(), blit::Point{8, 0}, entity_kitchen_fridge); // fridge
 
-    entities.emplace_back(*this, entities.size(), blit::Point{2, 3}, entity_bathroom_sink, 2); // bathroom sink
+    auto ent_pos = [this](int x, int y) {
+        return blit::Point{x + chunks[4].x * chunk_width, y + chunks[4].y * chunk_height};
+    };
 
-    entities.emplace_back(*this, entities.size(), blit::Point{1, 6}, entity_bedroom_bed, 1); // bed
+    create_entity(ent_pos(0, 0), entity_bathroom_shower); // shower
+    create_entity(ent_pos(2, 0), entity_bathroom_toilet); // toilet
+    create_entity(ent_pos(6, 0), entity_kitchen_oven); // oven
+    create_entity(ent_pos(7, 0), entity_kitchen_sink); // kitchen sink
+    create_entity(ent_pos(8, 0), entity_kitchen_fridge); // fridge
 
-    entities.emplace_back(*this, entities.size(), blit::Point{9, 7}, entity_livingroom_tv, 3); // tv
+    create_entity(ent_pos(2, 3), entity_bathroom_sink, 2); // bathroom sink
 
-    auto test_person_index = entities.size();
-    entities.emplace_back(*this, test_person_index, blit::Point{1, 1}, Person::entity_info); // test person
+    create_entity(ent_pos(1, 6), entity_bedroom_bed, 1); // bed
+
+    create_entity(ent_pos(9, 7), entity_livingroom_tv, 3); // tv
+
+    auto test_person_index = create_entity(ent_pos(1, 1), Person::entity_info); // test person
     people.emplace_back(*this, test_person_index);
 }
 

@@ -112,7 +112,7 @@ private:
 
     blit::Point scroll_pos;
 
-    static const int map_width = 2, map_height = 2;
+    static const int map_width = 3, map_height = 3;
     Chunk chunks[map_width * map_height];
 
     std::vector<Person> people;
