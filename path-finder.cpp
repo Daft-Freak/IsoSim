@@ -170,18 +170,13 @@ bool PathFinder::find_path(const blit::Point &start_pos, const blit::Point &end_
             if(g_use_this < old_cost || old_cost == -1) {
                 internal_state.tile_parents[neighbour] = tile;
                 internal_state.tile_costs[neighbour] = g_use_this;
-            }
 
-            //end compute cost
-
-            //cost decreased
-            if(internal_state.tile_costs[neighbour] < old_cost || old_cost == -1) {
                 auto &open_order = internal_state.open_order;
 
                 //remove and reinsert with new cost
                 int h = get_h(x, y);
 
-                int new_cost = internal_state.tile_costs[neighbour] + h;
+                int new_cost = g_use_this + h;
 
                 //find higher/equal cost
                 auto comp = [](const OpenListEntry &a, int b){return a.cost < b;};
